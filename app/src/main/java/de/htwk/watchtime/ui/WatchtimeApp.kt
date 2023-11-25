@@ -2,7 +2,6 @@ package de.htwk.watchtime.ui
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -26,7 +25,6 @@ enum class WatchtimeScreens(@StringRes val title: Int) {
     Stats(title = R.string.stats_screen),
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WatchtimeApp() {
     val navController = rememberNavController()
