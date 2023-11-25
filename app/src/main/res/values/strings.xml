@@ -5,4 +5,7 @@
     <string name="stats_screen">Statistics</string>
 
     <string name="navigate_back">Navigate back</string>
+
+    <string name="home_screen_popular_title">Popular</string>
+    <string name="home_screen_image_desc">Series Artwork</string>
 </resources>

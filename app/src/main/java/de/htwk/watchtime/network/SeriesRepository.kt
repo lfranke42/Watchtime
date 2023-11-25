@@ -17,7 +17,7 @@ class SeriesRepositoryImpl(
         seriesDtoList.forEach { seriesDto ->
             seriesList.add( Series(
                 name = seriesDto.name,
-                year = seriesDto.year.substring(0, 4),
+                year = seriesDto.year?.substring(0, 4) ?: "unknown",
                 imageUrl = seriesDto.imageUrl
             ) )
         }
