@@ -13,7 +13,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import de.htwk.watchtime.R
-import de.htwk.watchtime.ui.screens.home.HomeScreen
+import de.htwk.watchtime.ui.screens.DetailsScreen
+import de.htwk.watchtime.ui.screens.HomeScreen
+import de.htwk.watchtime.ui.screens.SearchScreen
+import de.htwk.watchtime.ui.screens.StatsScreen
 import de.htwk.watchtime.ui.screens.shared.components.WatchtimeAppBar
 
 enum class WatchtimeScreens(@StringRes val title: Int) {
@@ -46,6 +49,15 @@ fun WatchtimeApp() {
         ) {
             composable(route = WatchtimeScreens.Home.name) {
                 HomeScreen(modifier = Modifier.padding(innerPadding))
+            }
+            composable(route = WatchtimeScreens.Details.name) {
+                DetailsScreen(modifier = Modifier.padding(innerPadding))
+            }
+            composable(route = WatchtimeScreens.Search.name) {
+                SearchScreen(modifier = Modifier.padding(innerPadding))
+            }
+            composable(route = WatchtimeScreens.Stats.name) {
+                StatsScreen(modifier = Modifier.padding(innerPadding))
             }
         }
     }
