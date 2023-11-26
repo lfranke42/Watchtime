@@ -3,6 +3,7 @@ package de.htwk.watchtime.ui.screens
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
@@ -31,6 +33,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
@@ -45,12 +48,13 @@ fun HomeScreen(
     viewModel: HomeViewModel = koinViewModel()
 ) {
     val series by viewModel.series.collectAsState()
-    HomeScreen(recommendedSeries = series, modifier = modifier)
+    HomeScreen(recommendedSeries = series, continueWatchingList = series, modifier = modifier)
 }
 
 @Composable
 fun HomeScreen(
     recommendedSeries: List<Series>,
+    continueWatchingList: List<Series>,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
@@ -60,6 +64,12 @@ fun HomeScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
+        item {
+            HomeScreenTitle(text = stringResource(id = R.string.home_screen_continue_watching_title))
+        }
+        item {
+            ContinueWatchingCarousel(continueWatchingList = continueWatchingList)
+        }
         item {
             HomeScreenTitle(text = stringResource(id = R.string.home_screen_popular_title))
         }
@@ -82,11 +92,45 @@ fun HomeScreenTitle(text: String, modifier: Modifier = Modifier) {
 }
 
 @Composable
+fun ContinueWatchingCarousel(modifier: Modifier = Modifier, continueWatchingList: List<Series>) {
+    LazyRow(
+        modifier = modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        items(continueWatchingList) { series ->
+            CarouselCard(series)
+        }
+    }
+}
+
+@Composable
+fun CarouselCard(series: Series, modifier: Modifier = Modifier) {
+    Card(
+        modifier = modifier
+            .height(256.dp)
+            .width(164.dp)
+    ) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Text(
+                text = series.name,
+                style = MaterialTheme.typography.headlineLarge,
+                textAlign = TextAlign.Center
+            )
+            AsyncImage(
+                model = "https://artworks.thetvdb.com${series.imageUrl}",
+                contentDescription = stringResource(id = R.string.home_screen_image_desc),
+                contentScale = ContentScale.Crop
+            )
+        }
+    }
+}
+
+
+@Composable
 fun SeriesCard(
     series: Series
 ) {
     var contentScale by remember {
-        mutableStateOf(ContentScale.FillBounds)
+        mutableStateOf(ContentScale.Crop)
     }
 
     val currentIconColor = if (isSystemInDarkTheme()) Color.White else Color.Black
@@ -133,6 +177,12 @@ fun SeriesCard(
 
 @Preview
 @Composable
+fun CarouselCardPreview() {
+    CarouselCard(series = Series(name = "Breaking Bad", year = "2013", imageUrl = "/img/asdf399"))
+}
+
+@Preview
+@Composable
 fun SeriesCardPreview() {
     SeriesCard(series = Series(name = "Breaking Bad", year = "2013", imageUrl = "/img/asdf399"))
 }
@@ -141,12 +191,19 @@ fun SeriesCardPreview() {
 @Composable
 fun HomeScreenPreview() {
     Surface {
-        HomeScreen(recommendedSeries = List(10) {
-            Series(
-                name = "Breaking Bad",
-                year = "2013",
-                imageUrl = "/img/asdf399"
-            )
-        })
+        HomeScreen(
+            recommendedSeries = List(10) {
+                Series(
+                    name = "Breaking Bad",
+                    year = "2013",
+                    imageUrl = "/img/asdf399"
+                )
+            }, continueWatchingList = List(10) {
+                Series(
+                    name = "Breaking Bad",
+                    year = "2013",
+                    imageUrl = "/img/asdf399"
+                )
+            })
     }
 }
