@@ -1,10 +1,15 @@
 <resources>
     <string name="app_name">Watchtime</string>
+    <string name="home_screen">Home</string>
     <string name="search_screen">Search</string>
     <string name="details_screen">Details</string>
     <string name="stats_screen">Statistics</string>
 
     <string name="navigate_back">Navigate back</string>
+    <string name="navigate_home">Navigate to home</string>
+    <string name="navigate_search">Navigate to search</string>
+    <string name="navigate_stats">Navigate to stats</string>
+    <string name="navigate_details">Navigate to details</string>
 
     <string name="home_screen_popular_title">Popular</string>
     <string name="home_screen_image_desc">Series Artwork</string>
