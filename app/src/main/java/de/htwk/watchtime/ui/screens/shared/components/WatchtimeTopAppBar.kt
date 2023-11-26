@@ -18,7 +18,7 @@ import de.htwk.watchtime.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun WatchtimeAppBar(
+fun WatchtimeTopAppBar(
     modifier: Modifier = Modifier,
     canNavigateBack: Boolean,
     navigateBack: () -> Unit,
@@ -26,7 +26,7 @@ fun WatchtimeAppBar(
     CenterAlignedTopAppBar(
         title = { AppBarTitle() },
         modifier = modifier,
-        colors = TopAppBarDefaults.smallTopAppBarColors(
+        colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant
         ),
         navigationIcon = {
@@ -54,7 +54,7 @@ private fun AppBarTitle() {
 @Preview
 @Composable
 fun WatchTimeAppBarPreview() {
-    WatchtimeAppBar(
+    WatchtimeTopAppBar(
         canNavigateBack = false,
         navigateBack = {}
     )
@@ -63,7 +63,7 @@ fun WatchTimeAppBarPreview() {
 @Preview
 @Composable
 fun WatchTimeAppBarWithBackPreview() {
-    WatchtimeAppBar(
+    WatchtimeTopAppBar(
         canNavigateBack = true,
         navigateBack = {}
     )
