@@ -2,6 +2,7 @@ package de.htwk.watchtime.network
 
 import de.htwk.watchtime.network.dto.LoginRequest
 import de.htwk.watchtime.network.dto.LoginResponse
+import de.htwk.watchtime.network.dto.SeriesEpisodesResponse
 import de.htwk.watchtime.network.dto.SeriesResponse
 import retrofit2.Response
 import retrofit2.Retrofit
@@ -20,6 +21,8 @@ interface TvdbApi {
         @Header("Content-Type") contentType: String = "application/json",
         @Body loginRequest: LoginRequest,
     ): Response<LoginResponse>
+
+    suspend fun getEpisodes(@Header("Authorization") authHeader: String): Response<SeriesEpisodesResponse>
 
 }
 

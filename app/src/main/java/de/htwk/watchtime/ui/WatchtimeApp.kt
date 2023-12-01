@@ -14,7 +14,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import de.htwk.watchtime.R
-import de.htwk.watchtime.ui.screens.DetailsScreen
 import de.htwk.watchtime.ui.screens.HomeScreen
 import de.htwk.watchtime.ui.screens.SearchScreen
 import de.htwk.watchtime.ui.screens.StatsScreen
@@ -39,7 +38,7 @@ fun WatchtimeApp() {
     Scaffold(
         topBar = {
             WatchtimeTopAppBar(
-                canNavigateBack = currentScreen == WatchtimeScreens.Details,
+                canNavigateBack = false,
                 navigateBack = { navController.navigateUp() },
             )
         },
@@ -76,9 +75,6 @@ fun WatchtimeApp() {
         ) {
             composable(route = WatchtimeScreens.Home.name) {
                 HomeScreen(modifier = Modifier.padding(innerPadding))
-            }
-            composable(route = WatchtimeScreens.Details.name) {
-                DetailsScreen(modifier = Modifier.padding(innerPadding))
             }
             composable(route = WatchtimeScreens.Search.name) {
                 SearchScreen(modifier = Modifier.padding(innerPadding))

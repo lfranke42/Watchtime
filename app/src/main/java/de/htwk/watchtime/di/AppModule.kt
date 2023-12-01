@@ -6,6 +6,7 @@ import de.htwk.watchtime.network.RemoteSeriesDataSourceImpl
 import de.htwk.watchtime.network.SeriesRepository
 import de.htwk.watchtime.network.SeriesRepositoryImpl
 import de.htwk.watchtime.network.SessionManager
+import de.htwk.watchtime.ui.screens.shared.DetailsViewModel
 import de.htwk.watchtime.ui.screens.shared.HomeViewModel
 import org.koin.androidx.viewmodel.dsl.viewModelOf
 import org.koin.core.module.dsl.singleOf
@@ -18,4 +19,5 @@ val appModule = module {
     singleOf(::SessionManager)
     singleOf(::LocalContext)
     viewModelOf(::HomeViewModel)
+    viewModelOf(::DetailsViewModel)
 }

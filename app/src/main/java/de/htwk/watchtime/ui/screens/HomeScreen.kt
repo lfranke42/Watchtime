@@ -178,13 +178,13 @@ fun SeriesCard(
 @Preview
 @Composable
 fun CarouselCardPreview() {
-    CarouselCard(series = Series(name = "Breaking Bad", year = "2013", imageUrl = "/img/asdf399"))
+    CarouselCard(series = Series(name = "Breaking Bad", year = "2013", imageUrl = "/img/asdf399", id = 1, episodes = null))
 }
 
 @Preview
 @Composable
 fun SeriesCardPreview() {
-    SeriesCard(series = Series(name = "Breaking Bad", year = "2013", imageUrl = "/img/asdf399"))
+    SeriesCard(series = Series(name = "Breaking Bad", year = "2013", imageUrl = "/img/asdf399", id = 1, episodes = null))
 }
 
 @Preview
@@ -196,13 +196,17 @@ fun HomeScreenPreview() {
                 Series(
                     name = "Breaking Bad",
                     year = "2013",
-                    imageUrl = "/img/asdf399"
+                    imageUrl = "/img/asdf399",
+                    episodes = null,
+                    id = 1
                 )
             }, continueWatchingList = List(10) {
                 Series(
                     name = "Breaking Bad",
                     year = "2013",
-                    imageUrl = "/img/asdf399"
+                    imageUrl = "/img/asdf399",
+                    episodes = null,
+                    id = 1
                 )
             })
     }

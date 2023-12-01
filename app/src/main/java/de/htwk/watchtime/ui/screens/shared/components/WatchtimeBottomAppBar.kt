@@ -15,7 +15,7 @@ import de.htwk.watchtime.ui.WatchtimeScreens
 val navigatableItems = listOf(
     WatchtimeScreens.Home,
     WatchtimeScreens.Search,
-    WatchtimeScreens.Stats
+    WatchtimeScreens.Stats,
 )
 
 @Composable
