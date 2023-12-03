@@ -1,5 +1,6 @@
 package de.htwk.watchtime.network
 
+import android.util.Log
 import de.htwk.watchtime.BuildConfig
 import de.htwk.watchtime.network.dto.LoginRequest
 import de.htwk.watchtime.network.dto.SeriesDto
@@ -54,6 +55,7 @@ class RemoteSeriesDataSourceImpl(
 
     private suspend fun login(): String? {
         val apiKey = BuildConfig.API_KEY
+        Log.w("API_KEY", apiKey)
         val loginResponse =
             tvdbApi.login(loginRequest = LoginRequest(apiKey = apiKey))
         val responseBody = loginResponse.body()

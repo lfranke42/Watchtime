@@ -14,4 +14,6 @@
     <string name="home_screen_popular_title">Popular</string>
     <string name="home_screen_continue_watching_title">Continue Watching</string>
     <string name="home_screen_image_desc">Series Artwork</string>
+
+    <string name="details_screen_more_options">More options</string>
 </resources>
