@@ -144,7 +144,6 @@ fun SeriesCard(
     }
 
     val currentIconColor = if (isSystemInDarkTheme()) Color.White else Color.Black
-
     var colorFilter by remember { mutableStateOf<ColorFilter?>(null) }
 
     Card(

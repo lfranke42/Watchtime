@@ -15,7 +15,7 @@ class DetailsViewModel(
     private val seriesRepository: SeriesRepository
 ): ViewModel() {
     private val seriesId: Int = checkNotNull(savedStateHandle.get<Int>("seriesId"))
-    private val _seriesDetails: MutableStateFlow<ExtendedSeries> = MutableStateFlow(ExtendedSeries("", 0, "", "", emptyList(), emptyMap()))
+    private val _seriesDetails: MutableStateFlow<ExtendedSeries> = MutableStateFlow(ExtendedSeries("", 0, "", "", emptyList(), emptyMap(), ""))
     val seriesDetails: StateFlow<ExtendedSeries> = _seriesDetails
 
     init {

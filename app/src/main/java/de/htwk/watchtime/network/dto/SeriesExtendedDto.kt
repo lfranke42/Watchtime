@@ -10,5 +10,6 @@ data class SeriesExtendedDto (
     @Json(name = "lastAired") val year: String?,
     @Json(name = "image") val imageUrl: String?,
     @Json(name = "episodes") val episodes: List<EpisodeDto>,
-    @Json(name = "seasons") val seasons: List<SeasonDto>
+    @Json(name = "seasons") val seasons: List<SeasonDto>,
+    @Json(name = "overview") val description: String?,
 )

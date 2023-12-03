@@ -71,6 +71,7 @@ class SeriesRepositoryImpl(
             imageUrl = seriesDetails.imageUrl,
             episodes = episodeList,
             seasons = seasonList,
+            description = seriesDetails.description,
         )
     }
 }

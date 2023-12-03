@@ -7,4 +7,5 @@ data class ExtendedSeries(
     val imageUrl: String?,
     val episodes: List<Episode>,
     val seasons: Map<Int, Season>,
+    val description: String?,
 )
