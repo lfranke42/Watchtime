@@ -16,6 +16,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -45,17 +46,24 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
+    onCardTap: (seriesId: Int) -> Unit = {},
     viewModel: HomeViewModel = koinViewModel()
 ) {
-    val series by viewModel.series.collectAsState()
-    HomeScreen(recommendedSeries = series, continueWatchingList = series, modifier = modifier)
+    val seriesList by viewModel.series.collectAsState()
+    HomeScreen(
+        recommendedSeries = seriesList,
+        continueWatchingList = seriesList,
+        onCardTap = onCardTap,
+        modifier = modifier
+    )
 }
 
 @Composable
 fun HomeScreen(
     recommendedSeries: List<Series>,
     continueWatchingList: List<Series>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onCardTap: (seriesId: Int) -> Unit = {}
 ) {
     LazyColumn(
         modifier = modifier
@@ -74,7 +82,7 @@ fun HomeScreen(
             HomeScreenTitle(text = stringResource(id = R.string.home_screen_popular_title))
         }
         items(recommendedSeries) { series ->
-            SeriesCard(series = series)
+            SeriesCard(series = series, onTap = onCardTap)
         }
     }
 
@@ -125,9 +133,11 @@ fun CarouselCard(series: Series, modifier: Modifier = Modifier) {
 }
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SeriesCard(
-    series: Series
+    series: Series,
+    onTap: (seriesId: Int) -> Unit = {},
 ) {
     var contentScale by remember {
         mutableStateOf(ContentScale.Crop)
@@ -141,7 +151,8 @@ fun SeriesCard(
         modifier = Modifier
             .fillMaxWidth()
             .height(80.dp),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+        onClick = { onTap(series.id) }
     ) {
         Row(modifier = Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically) {
             Surface(
@@ -178,13 +189,27 @@ fun SeriesCard(
 @Preview
 @Composable
 fun CarouselCardPreview() {
-    CarouselCard(series = Series(name = "Breaking Bad", year = "2013", imageUrl = "/img/asdf399", id = 1, episodes = null))
+    CarouselCard(
+        series = Series(
+            name = "Breaking Bad",
+            year = "2013",
+            imageUrl = "/img/asdf399",
+            id = 1
+        )
+    )
 }
 
 @Preview
 @Composable
 fun SeriesCardPreview() {
-    SeriesCard(series = Series(name = "Breaking Bad", year = "2013", imageUrl = "/img/asdf399", id = 1, episodes = null))
+    SeriesCard(
+        series = Series(
+            name = "Breaking Bad",
+            year = "2013",
+            imageUrl = "/img/asdf399",
+            id = 1
+        )
+    )
 }
 
 @Preview
@@ -197,7 +222,6 @@ fun HomeScreenPreview() {
                     name = "Breaking Bad",
                     year = "2013",
                     imageUrl = "/img/asdf399",
-                    episodes = null,
                     id = 1
                 )
             }, continueWatchingList = List(10) {
@@ -205,7 +229,6 @@ fun HomeScreenPreview() {
                     name = "Breaking Bad",
                     year = "2013",
                     imageUrl = "/img/asdf399",
-                    episodes = null,
                     id = 1
                 )
             })

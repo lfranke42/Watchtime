@@ -1,20 +1,20 @@
 package de.htwk.watchtime.network
 
 import de.htwk.watchtime.BuildConfig
-import de.htwk.watchtime.network.dto.EpisodeDto
 import de.htwk.watchtime.network.dto.LoginRequest
 import de.htwk.watchtime.network.dto.SeriesDto
+import de.htwk.watchtime.network.dto.SeriesExtendedDto
 
 interface RemoteSeriesDataSource {
     suspend fun getSeries(): List<SeriesDto>
-    suspend fun getEpisodes(): List<EpisodeDto>
+    suspend fun getSeriesDetails(id: Int): SeriesExtendedDto?
 }
 
 class RemoteSeriesDataSourceImpl(
     private val sessionManager: SessionManager
 ) : RemoteSeriesDataSource {
 
-    override suspend fun getEpisodes(): List<EpisodeDto> {
+    override suspend fun getSeriesDetails(id: Int): SeriesExtendedDto? {
         var token = sessionManager.fetchAuthToken()
         if (token == null) {
             token = login()
@@ -23,15 +23,14 @@ class RemoteSeriesDataSourceImpl(
             }
         }
 
-        val episodesResponse = tvdbApi.getEpisodes(token)
-        val responseBody = episodesResponse.body()
+        val seriesDetailsResponse = tvdbApi.getSeriesDetails(authHeader = token, id = id)
+        val responseBody = seriesDetailsResponse.body()
 
-        return if (episodesResponse.isSuccessful && responseBody != null)
-            responseBody.data.episodes
+        return if (seriesDetailsResponse.isSuccessful && responseBody != null)
+            responseBody.data
         else {
-            listOf()
+            null
         }
-
     }
 
     override suspend fun getSeries(): List<SeriesDto> {
