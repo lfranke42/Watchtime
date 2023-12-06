@@ -77,7 +77,7 @@ fun HomeScreen(
             HomeScreenTitle(text = stringResource(id = R.string.home_screen_continue_watching_title))
         }
         item {
-            ContinueWatchingCarousel(continueWatchingList = continueWatchingList)
+            ContinueWatchingCarousel(continueWatchingList = continueWatchingList, onCardTap = onCardTap)
         }
         item {
             HomeScreenTitle(text = stringResource(id = R.string.home_screen_popular_title))
@@ -101,19 +101,29 @@ fun HomeScreenTitle(text: String, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun ContinueWatchingCarousel(modifier: Modifier = Modifier, continueWatchingList: List<Series>) {
+fun ContinueWatchingCarousel(
+    modifier: Modifier = Modifier,
+    continueWatchingList: List<Series>,
+    onCardTap: (seriesId: Int) -> Unit = {}
+) {
     LazyRow(
         modifier = modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         items(continueWatchingList) { series ->
-            CarouselCard(series)
+            CarouselCard(series, onCardTap = onCardTap)
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CarouselCard(series: Series, modifier: Modifier = Modifier) {
+fun CarouselCard(
+    series: Series,
+    modifier: Modifier = Modifier,
+    onCardTap: (seriesId: Int) -> Unit = {}
+) {
     Card(
+        onClick = { onCardTap(series.id) },
         modifier = modifier
             .height(256.dp)
             .width(164.dp)
@@ -170,6 +180,11 @@ fun SeriesCard(
                         contentScale = ContentScale.Inside
                         colorFilter = ColorFilter.tint(currentIconColor)
                     },
+                    onSuccess = {
+                        contentScale = ContentScale.Crop
+                        colorFilter = null
+
+                    },
                     contentScale = contentScale,
                     colorFilter = colorFilter
                 )
@@ -181,7 +196,7 @@ fun SeriesCard(
             ) {
                 Text(
                     text = series.name,
-                    style = MaterialTheme.typography.bodyMedium,
+                    style = MaterialTheme.typography.bodyLarge,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
