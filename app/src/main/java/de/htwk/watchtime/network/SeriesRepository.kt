@@ -70,7 +70,7 @@ class SeriesRepositoryImpl(
             year = seriesDetails.year?.substring(0, 4) ?: "unknown",
             imageUrl = seriesDetails.imageUrl,
             episodes = episodeList,
-            seasons = seasonList,
+            seasons = seasonList.toSortedMap(),
             description = seriesDetails.description,
         )
     }
