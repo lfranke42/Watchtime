@@ -4,12 +4,14 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Check
@@ -17,6 +19,7 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
@@ -43,6 +46,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import de.htwk.watchtime.R
+import de.htwk.watchtime.data.Episode
 import de.htwk.watchtime.data.ExtendedSeries
 import de.htwk.watchtime.data.Season
 import de.htwk.watchtime.ui.screens.shared.DetailsViewModel
@@ -75,6 +79,9 @@ fun DetailsScreen(
     closeBottomSheet: () -> Unit = {},
     changeSeason: (Int) -> Unit = {}
 ) {
+    val seasonEpisodes: List<Episode> =
+        seriesDetails.episodes.filter { it.seasonNumber == selectedSeason }
+
     Box(modifier = modifier.fillMaxSize()) {
         Card(
             modifier = Modifier
@@ -84,6 +91,7 @@ fun DetailsScreen(
                 defaultElevation = 8.dp
             ),
         ) {
+
             LazyColumn {
                 item {
                     CardHeader(
@@ -110,6 +118,12 @@ fun DetailsScreen(
                         selectedSeason = selectedSeason,
                         openSeasonSelect = openBottomSheet
                     )
+                }
+                itemsIndexed(seasonEpisodes) { index, episode ->
+                    EpisodeRow(episodeTitle = episode.name, checked = false, episodeNumber = index + 1)
+                }
+                item {
+                    Spacer(modifier = Modifier.height(16.dp))
                 }
             }
         }
@@ -199,7 +213,7 @@ fun SeasonSelectionChip(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(start = 16.dp, end = 16.dp),
+            .padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -263,6 +277,26 @@ fun SeasonSelectBottomSheet(
             }
 
         }
+    }
+}
+
+@Composable
+fun EpisodeRow(
+    episodeTitle: String,
+    modifier: Modifier = Modifier,
+    episodeNumber: Int = 1,
+    checked: Boolean,
+    onCheckChange: (Boolean) -> Unit = {},
+) {
+    Row(
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(start = 16.dp, end = 16.dp)
+    ) {
+        Text(text = "$episodeNumber ∙ $episodeTitle", maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
+        Checkbox(checked = checked, onCheckedChange = onCheckChange)
     }
 }
 

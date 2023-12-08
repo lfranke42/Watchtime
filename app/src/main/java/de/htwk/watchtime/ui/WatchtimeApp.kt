@@ -92,13 +92,13 @@ fun WatchtimeApp() {
                         launchSingleTop = true
                         restoreState = true
                     }
-                },
+                }
             )
         }
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = WatchtimeScreens.Home.name
+            startDestination = WatchtimeScreens.Home.name,
         ) {
             composable(route = WatchtimeScreens.Home.name) {
                 HomeScreen(modifier = Modifier.padding(innerPadding), onCardTap = { seriesId ->
