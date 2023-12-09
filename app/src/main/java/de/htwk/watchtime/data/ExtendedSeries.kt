@@ -8,4 +8,5 @@ data class ExtendedSeries(
     val episodes: List<Episode>,
     val seasons: Map<Int, Season>,
     val description: String?,
+    val genres: List<Genre>,
 )

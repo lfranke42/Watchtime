@@ -12,4 +12,5 @@ data class SeriesExtendedDto (
     @Json(name = "episodes") val episodes: List<EpisodeDto>,
     @Json(name = "seasons") val seasons: List<SeasonDto>,
     @Json(name = "overview") val description: String?,
+    @Json(name = "genres") val genres: List<GenreDto>?,
 )

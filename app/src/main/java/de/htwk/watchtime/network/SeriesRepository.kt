@@ -2,6 +2,7 @@ package de.htwk.watchtime.network
 
 import de.htwk.watchtime.data.Episode
 import de.htwk.watchtime.data.ExtendedSeries
+import de.htwk.watchtime.data.Genre
 import de.htwk.watchtime.data.Season
 import de.htwk.watchtime.data.Series
 
@@ -35,6 +36,7 @@ class SeriesRepositoryImpl(
         val seriesDetails = dataSource.getSeriesDetails(id)
         val episodeList = mutableListOf<Episode>()
         val seasonList = mutableMapOf<Int, Season>()
+        val genreList = mutableListOf<Genre>()
 
         if (seriesDetails == null) {
             throw Exception("Series details not found")
@@ -64,6 +66,15 @@ class SeriesRepositoryImpl(
             seasonList[episodeDto.seasonNumber]?.episodeIds?.add(episodeDto.id)
         }
 
+        seriesDetails.genres?.forEach { genreDto ->
+            genreList.add(
+                Genre(
+                    id = genreDto.id,
+                    name = genreDto.name,
+                )
+            )
+        }
+
         return ExtendedSeries(
             name = seriesDetails.name,
             id = seriesDetails.id,
@@ -72,6 +83,7 @@ class SeriesRepositoryImpl(
             episodes = episodeList,
             seasons = seasonList.toSortedMap(),
             description = seriesDetails.description,
+            genres = genreList,
         )
     }
 }

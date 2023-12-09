@@ -1,5 +1,6 @@
 package de.htwk.watchtime.ui.screens.shared
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -26,7 +27,8 @@ class DetailsViewModel(
                 imageUrl = null,
                 episodes = emptyList(),
                 seasons = emptyMap(),
-                description = null
+                description = null,
+                genres = emptyList()
             ), selectedSeason = 1
         )
     )
@@ -64,6 +66,25 @@ class DetailsViewModel(
     fun closeBottomSheet() {
         _detailsScreenUiState.update { currentState ->
             currentState.copy(bottomSheetVisible = false)
+        }
+    }
+
+    fun toggleEpisodeWatched(episodeId: Int, watched: Boolean) {
+        if (watched) {
+            _detailsScreenUiState.update { currentState ->
+                currentState.copy(
+                    episodesWatched = currentState.episodesWatched + episodeId
+                )
+            }
+            Log.i("DetailsViewModel", "Episode $episodeId watched")
+            /* TODO: DB update */
+        } else {
+            _detailsScreenUiState.update { currentState ->
+                currentState.copy(
+                    episodesWatched = currentState.episodesWatched - episodeId
+                )
+            }
+            /* TODO: DB update */
         }
     }
 }

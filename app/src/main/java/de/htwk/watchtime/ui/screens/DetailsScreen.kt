@@ -17,9 +17,8 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.AssistChip
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
@@ -58,6 +57,7 @@ fun DetailsScreen(
     viewModel: DetailsViewModel = koinViewModel()
 ) {
     val detailsScreenUiState by viewModel.seriesDetails.collectAsState()
+
     DetailsScreen(
         seriesDetails = detailsScreenUiState.seriesDetails,
         selectedSeason = detailsScreenUiState.selectedSeason,
@@ -65,6 +65,13 @@ fun DetailsScreen(
         openBottomSheet = { viewModel.openBottomSheet() },
         closeBottomSheet = { viewModel.closeBottomSheet() },
         changeSeason = { viewModel.selectSeason(it) },
+        toggleEpisodeWatched = { episodeId, watched ->
+            viewModel.toggleEpisodeWatched(
+                episodeId,
+                watched
+            )
+        },
+        episodesWatched = detailsScreenUiState.episodesWatched,
         modifier = modifier
     )
 }
@@ -77,19 +84,18 @@ fun DetailsScreen(
     modifier: Modifier = Modifier,
     openBottomSheet: () -> Unit = {},
     closeBottomSheet: () -> Unit = {},
-    changeSeason: (Int) -> Unit = {}
+    changeSeason: (Int) -> Unit = {},
+    toggleEpisodeWatched: (Int, Boolean) -> Unit = { _, _ -> },
+    episodesWatched: Set<Int> = emptySet(),
 ) {
     val seasonEpisodes: List<Episode> =
         seriesDetails.episodes.filter { it.seasonNumber == selectedSeason }
 
     Box(modifier = modifier.fillMaxSize()) {
-        Card(
+        ElevatedCard(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(16.dp),
-            elevation = CardDefaults.cardElevation(
-                defaultElevation = 8.dp
-            ),
         ) {
 
             LazyColumn {
@@ -120,7 +126,18 @@ fun DetailsScreen(
                     )
                 }
                 itemsIndexed(seasonEpisodes) { index, episode ->
-                    EpisodeRow(episodeTitle = episode.name, checked = false, episodeNumber = index + 1)
+                    val checked = episodesWatched.contains(episode.id)
+                    EpisodeRow(
+                        episodeTitle = episode.name,
+                        checked = checked,
+                        episodeNumber = index + 1,
+                        onCheckChange = { watched ->
+                            toggleEpisodeWatched(
+                                episode.id,
+                                watched
+                            )
+                        }
+                    )
                 }
                 item {
                     Spacer(modifier = Modifier.height(16.dp))
@@ -286,7 +303,7 @@ fun EpisodeRow(
     modifier: Modifier = Modifier,
     episodeNumber: Int = 1,
     checked: Boolean,
-    onCheckChange: (Boolean) -> Unit = {},
+    onCheckChange: (Boolean) -> Unit,
 ) {
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -295,8 +312,13 @@ fun EpisodeRow(
             .fillMaxWidth()
             .padding(start = 16.dp, end = 16.dp)
     ) {
-        Text(text = "$episodeNumber ∙ $episodeTitle", maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
-        Checkbox(checked = checked, onCheckedChange = onCheckChange)
+        Text(
+            text = "$episodeNumber ∙ $episodeTitle",
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.weight(1f)
+        )
+        Checkbox(checked = checked, onCheckedChange = { onCheckChange(it) })
     }
 }
 
@@ -312,7 +334,8 @@ fun DetailsScreenPreview() {
                 year = "1989",
                 id = 1,
                 imageUrl = "https://www.thetvdb.com/banners/posters/71663-1.jpg",
-                description = "This is a description"
+                description = "This is a description",
+                genres = listOf()
             ),
             selectedSeason = 1,
             bottomSheetVisible = false,

@@ -16,6 +16,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -124,6 +125,9 @@ fun CarouselCard(
 ) {
     Card(
         onClick = { onCardTap(series.id) },
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 8.dp
+        ),
         modifier = modifier
             .height(256.dp)
             .width(164.dp)
@@ -162,6 +166,9 @@ fun SeriesCard(
             .fillMaxWidth()
             .height(80.dp),
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 8.dp
+        ),
         onClick = { onTap(series.id) }
     ) {
         Row(modifier = Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically) {
@@ -251,6 +258,7 @@ fun HomeScreenPreview() {
                     imageUrl = "/img/asdf399",
                     id = 1
                 )
-            })
+            }
+        )
     }
 }
