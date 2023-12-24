@@ -124,4 +124,28 @@ class DetailsViewModel(
             /* TODO: DB update */
         }
     }
+
+    fun toggleDropDown() {
+        _detailsScreenUiState.update { currentState ->
+            currentState.copy(
+                dropDownExpanded = !currentState.dropDownExpanded
+            )
+        }
+    }
+
+    fun dismissDropDown() {
+        _detailsScreenUiState.update { currentState ->
+            currentState.copy(
+                dropDownExpanded = false
+            )
+        }
+    }
+
+    fun toggleSeriesWatched() {
+        _detailsScreenUiState.update { currentState ->
+            currentState.copy(
+                seriesCompleted = !currentState.seriesCompleted
+            )
+        }
+    }
 }

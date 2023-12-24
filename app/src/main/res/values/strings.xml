@@ -20,4 +20,5 @@
     <string name="details_screen_image_description">Series Artwork</string>
     <string name="details_screen_season_chip">Season</string>
     <string name="details_screen_watched_title">Season Completed?</string>
+    <string name="details_screen_series_completed">Series Completed</string>
 </resources>

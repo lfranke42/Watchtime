@@ -18,6 +18,8 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
@@ -63,6 +65,11 @@ fun DetailsScreen(
         selectedSeason = detailsScreenUiState.selectedSeason,
         bottomSheetVisible = detailsScreenUiState.bottomSheetVisible,
         seasonCompleted = detailsScreenUiState.seasonCompleted,
+        seriesCompleted = detailsScreenUiState.seriesCompleted,
+        dropDownExpanded = detailsScreenUiState.dropDownExpanded,
+        toggleDropDown = { viewModel.toggleDropDown() },
+        dismissDropDown = { viewModel.dismissDropDown() },
+        toggleSeriesWatched = { viewModel.toggleSeriesWatched() },
         openBottomSheet = { viewModel.openBottomSheet() },
         closeBottomSheet = { viewModel.closeBottomSheet() },
         onSeasonWatchedChange = { season, completed ->
@@ -89,7 +96,12 @@ fun DetailsScreen(
     selectedSeason: Int,
     bottomSheetVisible: Boolean,
     seasonCompleted: Boolean,
+    seriesCompleted: Boolean,
+    dropDownExpanded: Boolean,
     modifier: Modifier = Modifier,
+    toggleDropDown: () -> Unit = {},
+    dismissDropDown: () -> Unit = {},
+    toggleSeriesWatched: () -> Unit = {},
     openBottomSheet: () -> Unit = {},
     closeBottomSheet: () -> Unit = {},
     changeSeason: (Int) -> Unit = {},
@@ -113,7 +125,12 @@ fun DetailsScreen(
                         title = seriesDetails.name,
                         year = seriesDetails.year,
                         seasons = seriesDetails.seasons.size.toString(),
-                        episodes = seriesDetails.episodes.size.toString()
+                        episodes = seriesDetails.episodes.size.toString(),
+                        seriesCompleted = seriesCompleted,
+                        toggleSeriesWatched = toggleSeriesWatched,
+                        dropDownExpanded = dropDownExpanded,
+                        toggleDropDown = toggleDropDown,
+                        dismissDropDown = dismissDropDown
                     )
                 }
                 item {
@@ -175,7 +192,17 @@ fun DetailsScreen(
 }
 
 @Composable
-fun CardHeader(title: String, year: String, seasons: String, episodes: String) {
+fun CardHeader(
+    title: String,
+    year: String,
+    seasons: String,
+    episodes: String,
+    seriesCompleted: Boolean,
+    dropDownExpanded: Boolean,
+    toggleDropDown: () -> Unit = {},
+    toggleSeriesWatched: () -> Unit = {},
+    dismissDropDown: () -> Unit = {}
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -195,11 +222,30 @@ fun CardHeader(title: String, year: String, seasons: String, episodes: String) {
                 maxLines = 1, overflow = TextOverflow.Ellipsis
             )
         }
-        IconButton(onClick = { /*TODO*/ }) {
-            Icon(
-                Icons.Default.MoreVert,
-                contentDescription = stringResource(id = R.string.details_screen_more_options)
-            )
+        Box {
+            IconButton(onClick = toggleDropDown) {
+                Icon(
+                    Icons.Default.MoreVert,
+                    contentDescription = stringResource(id = R.string.details_screen_more_options)
+                )
+            }
+            DropdownMenu(expanded = dropDownExpanded, onDismissRequest = dismissDropDown) {
+                DropdownMenuItem(
+                    text = {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(stringResource(id = R.string.details_screen_series_completed))
+                            Checkbox(
+                                checked = seriesCompleted,
+                                onCheckedChange = null,
+                                modifier = Modifier.padding(start = 4.dp)
+                            )
+                        }
+                    },
+                    onClick = {
+                        toggleSeriesWatched()
+                        dismissDropDown()
+                    })
+            }
         }
     }
 }
@@ -275,7 +321,7 @@ fun WholeSeasonWatchedTickBox(
     seasonCompleted: Boolean = false,
     onSeasonWatchedChange: (Boolean) -> Unit
 ) {
-    Row (verticalAlignment = Alignment.CenterVertically) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
         Text(
             text = stringResource(id = R.string.details_screen_watched_title),
             style = MaterialTheme.typography.labelMedium,
@@ -374,6 +420,8 @@ fun DetailsScreenPreview() {
             selectedSeason = 1,
             bottomSheetVisible = false,
             seasonCompleted = false,
+            seriesCompleted = false,
+            dropDownExpanded = false,
             modifier = Modifier.fillMaxSize()
         )
     }
