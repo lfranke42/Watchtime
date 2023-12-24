@@ -7,4 +7,5 @@ data class DetailsScreenUiState(
     val selectedSeason: Int,
     val bottomSheetVisible: Boolean = false,
     val episodesWatched: Set<Int> = emptySet(),
+    val seasonCompleted: Boolean = false
 )

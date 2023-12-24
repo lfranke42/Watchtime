@@ -62,8 +62,15 @@ fun DetailsScreen(
         seriesDetails = detailsScreenUiState.seriesDetails,
         selectedSeason = detailsScreenUiState.selectedSeason,
         bottomSheetVisible = detailsScreenUiState.bottomSheetVisible,
+        seasonCompleted = detailsScreenUiState.seasonCompleted,
         openBottomSheet = { viewModel.openBottomSheet() },
         closeBottomSheet = { viewModel.closeBottomSheet() },
+        onSeasonWatchedChange = { season, completed ->
+            viewModel.toggleSeasonWatched(
+                season,
+                completed
+            )
+        },
         changeSeason = { viewModel.selectSeason(it) },
         toggleEpisodeWatched = { episodeId, watched ->
             viewModel.toggleEpisodeWatched(
@@ -81,10 +88,12 @@ fun DetailsScreen(
     seriesDetails: ExtendedSeries,
     selectedSeason: Int,
     bottomSheetVisible: Boolean,
+    seasonCompleted: Boolean,
     modifier: Modifier = Modifier,
     openBottomSheet: () -> Unit = {},
     closeBottomSheet: () -> Unit = {},
     changeSeason: (Int) -> Unit = {},
+    onSeasonWatchedChange: (Season, Boolean) -> Unit = { _, _ -> },
     toggleEpisodeWatched: (Int, Boolean) -> Unit = { _, _ -> },
     episodesWatched: Set<Int> = emptySet(),
 ) {
@@ -120,9 +129,18 @@ fun DetailsScreen(
                     }
                 }
                 item {
-                    SeasonSelectionChip(
+                    SeasonHeader(
                         selectedSeason = selectedSeason,
-                        openSeasonSelect = openBottomSheet
+                        openSeasonSelect = openBottomSheet,
+                        seasonCompleted = seasonCompleted,
+                        onSeasonWatchedChange = {
+                            val currentSeason = seriesDetails.seasons[selectedSeason] ?: Season(
+                                id = 0,
+                                seasonNumber = 0,
+                                episodeIds = mutableListOf()
+                            )
+                            onSeasonWatchedChange(currentSeason, seasonCompleted)
+                        }
                     )
                 }
                 itemsIndexed(seasonEpisodes) { index, episode ->
@@ -223,9 +241,12 @@ fun SeriesDescription(description: String) {
 }
 
 @Composable
-fun SeasonSelectionChip(
-    modifier: Modifier = Modifier, selectedSeason: Int,
-    openSeasonSelect: () -> Unit = {}
+fun SeasonHeader(
+    modifier: Modifier = Modifier,
+    selectedSeason: Int,
+    seasonCompleted: Boolean,
+    openSeasonSelect: () -> Unit = {},
+    onSeasonWatchedChange: (Boolean) -> Unit = {}
 ) {
     Row(
         modifier = modifier
@@ -242,11 +263,24 @@ fun SeasonSelectionChip(
                 contentDescription = stringResource(id = R.string.details_screen_select_season)
             )
         })
+        WholeSeasonWatchedTickBox(
+            seasonCompleted = seasonCompleted,
+            onSeasonWatchedChange = onSeasonWatchedChange
+        )
+    }
+}
+
+@Composable
+fun WholeSeasonWatchedTickBox(
+    seasonCompleted: Boolean = false,
+    onSeasonWatchedChange: (Boolean) -> Unit
+) {
+    Row (verticalAlignment = Alignment.CenterVertically) {
         Text(
             text = stringResource(id = R.string.details_screen_watched_title),
-            style = MaterialTheme.typography.titleMedium,
+            style = MaterialTheme.typography.labelMedium,
         )
-
+        Checkbox(checked = seasonCompleted, onCheckedChange = onSeasonWatchedChange)
     }
 }
 
@@ -339,6 +373,7 @@ fun DetailsScreenPreview() {
             ),
             selectedSeason = 1,
             bottomSheetVisible = false,
+            seasonCompleted = false,
             modifier = Modifier.fillMaxSize()
         )
     }

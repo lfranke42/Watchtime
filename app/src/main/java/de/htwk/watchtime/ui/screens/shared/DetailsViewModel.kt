@@ -5,6 +5,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import de.htwk.watchtime.data.ExtendedSeries
+import de.htwk.watchtime.data.Season
 import de.htwk.watchtime.data.uiState.DetailsScreenUiState
 import de.htwk.watchtime.network.SeriesRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -52,6 +53,7 @@ class DetailsViewModel(
     }
 
     fun selectSeason(season: Int) {
+        /* TODO: fetch season watch status from DB and update checkbox accordingly */
         _detailsScreenUiState.update { currentState ->
             currentState.copy(selectedSeason = season, bottomSheetVisible = false)
         }
@@ -77,11 +79,46 @@ class DetailsViewModel(
                 )
             }
             Log.i("DetailsViewModel", "Episode $episodeId watched")
+
+            val seasonNumber = seriesDetails.value.seriesDetails.episodes.find { it.id == episodeId }
+            Log.i("DetailsViewModel", "Belonging to season number $seasonNumber")
             /* TODO: DB update */
         } else {
             _detailsScreenUiState.update { currentState ->
                 currentState.copy(
                     episodesWatched = currentState.episodesWatched - episodeId
+                )
+            }
+            /* TODO: DB update */
+        }
+        /* TODO: Check in DB if whole season is watched */
+    }
+
+    fun toggleSeasonWatched(season: Season, completed: Boolean) {
+        if (!completed) {
+            _detailsScreenUiState.update { currentState ->
+                val seriesEpisodes =
+                    currentState.seriesDetails.episodes.filter { it.seasonNumber == season.seasonNumber }
+                val episodeIds = seriesEpisodes.map { it.id }
+
+                currentState.copy(
+                    episodesWatched = currentState.episodesWatched + episodeIds.toSet(),
+                    seasonCompleted = true
+                )
+
+            }
+            Log.i("check", "season: ${season.seasonNumber}")
+            Log.i("check", "completed: ${seriesDetails.value.episodesWatched}")
+            /* TODO: DB update */
+        } else {
+            _detailsScreenUiState.update { currentState ->
+                val seriesEpisodes =
+                    currentState.seriesDetails.episodes.filter { it.seasonNumber == season.seasonNumber }
+                val episodeIds = seriesEpisodes.map { it.id }
+
+                currentState.copy(
+                    episodesWatched = currentState.episodesWatched - episodeIds.toSet(),
+                    seasonCompleted = false
                 )
             }
             /* TODO: DB update */
