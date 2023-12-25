@@ -142,10 +142,28 @@ class DetailsViewModel(
     }
 
     fun toggleSeriesWatched() {
+        val seriesCompleted = seriesDetails.value.seriesCompleted
+
+        if (seriesCompleted) {
+            _detailsScreenUiState.update { currentState ->
+                currentState.copy(
+                    episodesWatched = setOf(),
+                    seriesCompleted = false
+                )
+            }
+            /* TODO: DB update */
+            return
+        }
+
+        val episodeList = seriesDetails.value.seriesDetails.episodes
+        val episodeIdList = episodeList.map { it.id }
+
         _detailsScreenUiState.update { currentState ->
             currentState.copy(
-                seriesCompleted = !currentState.seriesCompleted
+                episodesWatched = episodeIdList.toSet(),
+                seriesCompleted = true
             )
         }
+        /* TODO: DB update */
     }
 }
