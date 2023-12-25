@@ -16,6 +16,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -34,6 +36,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
@@ -45,17 +48,24 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
+    onCardTap: (seriesId: Int) -> Unit = {},
     viewModel: HomeViewModel = koinViewModel()
 ) {
-    val series by viewModel.series.collectAsState()
-    HomeScreen(recommendedSeries = series, continueWatchingList = series, modifier = modifier)
+    val seriesList by viewModel.series.collectAsState()
+    HomeScreen(
+        recommendedSeries = seriesList,
+        continueWatchingList = seriesList,
+        onCardTap = onCardTap,
+        modifier = modifier
+    )
 }
 
 @Composable
 fun HomeScreen(
     recommendedSeries: List<Series>,
     continueWatchingList: List<Series>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onCardTap: (seriesId: Int) -> Unit = {}
 ) {
     LazyColumn(
         modifier = modifier
@@ -68,13 +78,13 @@ fun HomeScreen(
             HomeScreenTitle(text = stringResource(id = R.string.home_screen_continue_watching_title))
         }
         item {
-            ContinueWatchingCarousel(continueWatchingList = continueWatchingList)
+            ContinueWatchingCarousel(continueWatchingList = continueWatchingList, onCardTap = onCardTap)
         }
         item {
             HomeScreenTitle(text = stringResource(id = R.string.home_screen_popular_title))
         }
         items(recommendedSeries) { series ->
-            SeriesCard(series = series)
+            SeriesCard(series = series, onTap = onCardTap)
         }
     }
 
@@ -92,19 +102,32 @@ fun HomeScreenTitle(text: String, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun ContinueWatchingCarousel(modifier: Modifier = Modifier, continueWatchingList: List<Series>) {
+fun ContinueWatchingCarousel(
+    modifier: Modifier = Modifier,
+    continueWatchingList: List<Series>,
+    onCardTap: (seriesId: Int) -> Unit = {}
+) {
     LazyRow(
         modifier = modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         items(continueWatchingList) { series ->
-            CarouselCard(series)
+            CarouselCard(series, onCardTap = onCardTap)
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CarouselCard(series: Series, modifier: Modifier = Modifier) {
+fun CarouselCard(
+    series: Series,
+    modifier: Modifier = Modifier,
+    onCardTap: (seriesId: Int) -> Unit = {}
+) {
     Card(
+        onClick = { onCardTap(series.id) },
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 8.dp
+        ),
         modifier = modifier
             .height(256.dp)
             .width(164.dp)
@@ -125,23 +148,28 @@ fun CarouselCard(series: Series, modifier: Modifier = Modifier) {
 }
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SeriesCard(
-    series: Series
+    series: Series,
+    onTap: (seriesId: Int) -> Unit = {},
 ) {
     var contentScale by remember {
         mutableStateOf(ContentScale.Crop)
     }
 
     val currentIconColor = if (isSystemInDarkTheme()) Color.White else Color.Black
-
     var colorFilter by remember { mutableStateOf<ColorFilter?>(null) }
 
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .height(80.dp),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 8.dp
+        ),
+        onClick = { onTap(series.id) }
     ) {
         Row(modifier = Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically) {
             Surface(
@@ -159,6 +187,11 @@ fun SeriesCard(
                         contentScale = ContentScale.Inside
                         colorFilter = ColorFilter.tint(currentIconColor)
                     },
+                    onSuccess = {
+                        contentScale = ContentScale.Crop
+                        colorFilter = null
+
+                    },
                     contentScale = contentScale,
                     colorFilter = colorFilter
                 )
@@ -168,7 +201,12 @@ fun SeriesCard(
                 modifier = Modifier.padding(12.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Text(text = series.name, style = MaterialTheme.typography.bodyMedium)
+                Text(
+                    text = series.name,
+                    style = MaterialTheme.typography.bodyLarge,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
                 Text(text = series.year, style = MaterialTheme.typography.bodySmall)
             }
         }
@@ -178,13 +216,27 @@ fun SeriesCard(
 @Preview
 @Composable
 fun CarouselCardPreview() {
-    CarouselCard(series = Series(name = "Breaking Bad", year = "2013", imageUrl = "/img/asdf399"))
+    CarouselCard(
+        series = Series(
+            name = "Breaking Bad",
+            year = "2013",
+            imageUrl = "/img/asdf399",
+            id = 1
+        )
+    )
 }
 
 @Preview
 @Composable
 fun SeriesCardPreview() {
-    SeriesCard(series = Series(name = "Breaking Bad", year = "2013", imageUrl = "/img/asdf399"))
+    SeriesCard(
+        series = Series(
+            name = "Breaking Bad",
+            year = "2013",
+            imageUrl = "/img/asdf399",
+            id = 1
+        )
+    )
 }
 
 @Preview
@@ -196,14 +248,17 @@ fun HomeScreenPreview() {
                 Series(
                     name = "Breaking Bad",
                     year = "2013",
-                    imageUrl = "/img/asdf399"
+                    imageUrl = "/img/asdf399",
+                    id = 1
                 )
             }, continueWatchingList = List(10) {
                 Series(
                     name = "Breaking Bad",
                     year = "2013",
-                    imageUrl = "/img/asdf399"
+                    imageUrl = "/img/asdf399",
+                    id = 1
                 )
-            })
+            }
+        )
     }
 }

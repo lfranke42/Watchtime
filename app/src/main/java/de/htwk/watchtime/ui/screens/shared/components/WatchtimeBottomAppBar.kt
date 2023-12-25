@@ -15,12 +15,12 @@ import de.htwk.watchtime.ui.WatchtimeScreens
 val navigatableItems = listOf(
     WatchtimeScreens.Home,
     WatchtimeScreens.Search,
-    WatchtimeScreens.Stats
+    WatchtimeScreens.Stats,
 )
 
 @Composable
 fun WatchtimeBottomAppBar(
-    currentScreen: WatchtimeScreens,
+    currentScreen: String,
     navToHome: () -> (Unit) = { },
     navToSearch: () -> (Unit) = { },
     navToStats: () -> (Unit) = { }
@@ -45,7 +45,7 @@ fun WatchtimeBottomAppBar(
                         WatchtimeScreens.Details -> {}
                     }
                 },
-                selected = currentScreen == screen,
+                selected = currentScreen == screen.name,
             )
         }
     }
@@ -54,5 +54,5 @@ fun WatchtimeBottomAppBar(
 @Preview
 @Composable
 fun WatchtimeBottomAppBarPreview() {
-    WatchtimeBottomAppBar(currentScreen = WatchtimeScreens.Home)
+    WatchtimeBottomAppBar(currentScreen = WatchtimeScreens.Home.name)
 }
