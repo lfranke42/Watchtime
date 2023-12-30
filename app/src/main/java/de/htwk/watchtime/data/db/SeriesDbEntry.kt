@@ -7,6 +7,5 @@ import androidx.room.PrimaryKey
 data class SeriesDbEntry(
     @PrimaryKey
     val seriesId: Int,
-    val seasonIdsCompleted: Set<Int>,
     val seriesCompleted: Boolean,
 )
