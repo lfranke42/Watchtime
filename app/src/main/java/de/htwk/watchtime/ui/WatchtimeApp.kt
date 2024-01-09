@@ -106,7 +106,9 @@ fun WatchtimeApp() {
                 })
             }
             composable(route = WatchtimeScreens.Search.name) {
-                SearchScreen(modifier = Modifier.padding(innerPadding))
+                SearchScreen(modifier = Modifier.padding(innerPadding), onCardTap = { seriesId ->
+                    navController.navigate(WatchtimeScreens.Details.name + "/$seriesId")
+                })
             }
             composable(route = WatchtimeScreens.Stats.name) {
                 StatsScreen(modifier = Modifier.padding(innerPadding))

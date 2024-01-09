@@ -71,6 +71,7 @@ dependencies {
     implementation(libs.material3)
     implementation(libs.androidx.navigation.compose)
 
+
     implementation(libs.retrofit.core)
     implementation(libs.retrofit.moshiConverter)
     implementation(libs.retrofit.loggingInterceptor)
@@ -91,4 +92,8 @@ dependencies {
     androidTestImplementation(libs.ui.test.junit4)
     debugImplementation(libs.ui.tooling)
     debugImplementation(libs.ui.test.manifest)
+    implementation("androidx.compose.material:material-icons-core:1.5.4")
+
+
+
 }
