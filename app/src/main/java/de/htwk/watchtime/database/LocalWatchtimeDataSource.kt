@@ -5,25 +5,23 @@ import de.htwk.watchtime.data.db.SeriesDbEntry
 import de.htwk.watchtime.data.db.UserWatchtimeDbEntry
 
 interface LocalWatchtimeDataSource {
-    suspend fun getSeries(seriesId: Int): SeriesDbEntry
-    suspend fun getEpisode(episodeId: Int): EpisodeDbEntry
+    suspend fun getSeries(seriesId: Int): SeriesDbEntry?
+    suspend fun getEpisode(episodeId: Int): EpisodeDbEntry?
     suspend fun getWatchedEpisodeIds(seriesId: Int): List<Int>
-
     suspend fun insertSeries(series: SeriesDbEntry)
-    suspend fun insertEpisode(episode: EpisodeDbEntry)
+    suspend fun insertNewEpisode(episode: EpisodeDbEntry)
     suspend fun insertWatchtimeEntry(watchtimeEntry: UserWatchtimeDbEntry)
-
     suspend fun deleteWatchtimeEntry(watchtimeEntry: UserWatchtimeDbEntry)
 
 }
 
 class LocalWatchtimeDataSourceImpl(private val watchtimeDao: WatchtimeDao) :
     LocalWatchtimeDataSource {
-    override suspend fun getSeries(seriesId: Int): SeriesDbEntry {
+    override suspend fun getSeries(seriesId: Int): SeriesDbEntry? {
         return watchtimeDao.getSeries(seriesId)
     }
 
-    override suspend fun getEpisode(episodeId: Int): EpisodeDbEntry {
+    override suspend fun getEpisode(episodeId: Int): EpisodeDbEntry? {
         return watchtimeDao.getEpisode(episodeId)
     }
 
@@ -31,7 +29,7 @@ class LocalWatchtimeDataSourceImpl(private val watchtimeDao: WatchtimeDao) :
         return watchtimeDao.getWatchedEpisodeIds(seriesId)
     }
 
-    override suspend fun insertEpisode(episode: EpisodeDbEntry) {
+    override suspend fun insertNewEpisode(episode: EpisodeDbEntry) {
         watchtimeDao.insertEpisode(episode)
     }
 

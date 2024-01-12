@@ -11,5 +11,5 @@ data class EpisodeDbEntry(
     val seriesId: Int,
     val seasonNumber: Int,
     val runtime: Int?,
-    val dateWatched: Date
+    val dateWatched: Date?
 )

@@ -57,6 +57,9 @@ android {
         propertiesFileName = "secrets.properties"
         defaultPropertiesFileName = "secrets.defaults.properties"
     }
+    ksp {
+        arg("room.schemaLocation", "$projectDir/schemas")
+    }
 }
 
 dependencies {

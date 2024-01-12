@@ -4,7 +4,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.room.Room
 import de.htwk.watchtime.database.LocalWatchtimeDataSource
 import de.htwk.watchtime.database.LocalWatchtimeDataSourceImpl
+import de.htwk.watchtime.database.WatchtimeDao
 import de.htwk.watchtime.database.WatchtimeDatabase
+import de.htwk.watchtime.database.WatchtimeRepository
+import de.htwk.watchtime.database.WatchtimeRepositoryImpl
 import de.htwk.watchtime.network.RemoteSeriesDataSource
 import de.htwk.watchtime.network.RemoteSeriesDataSourceImpl
 import de.htwk.watchtime.network.SeriesRepository
@@ -22,6 +25,7 @@ val appModule = module {
     singleOf(::RemoteSeriesDataSourceImpl) bind RemoteSeriesDataSource::class
     singleOf(::SeriesRepositoryImpl) bind SeriesRepository::class
     singleOf(::LocalWatchtimeDataSourceImpl) bind LocalWatchtimeDataSource::class
+    singleOf(::WatchtimeRepositoryImpl) bind WatchtimeRepository::class
     singleOf(::SessionManager)
     singleOf(::LocalContext)
     single {
@@ -29,9 +33,12 @@ val appModule = module {
             androidApplication(),
             WatchtimeDatabase::class.java,
             "watchtime-database"
-        )
+        ).build()
     }
-    single { get<WatchtimeDatabase>().seriesDao() }
+    single<WatchtimeDao> {
+        val database = get<WatchtimeDatabase>()
+        database.watchtimeDao()
+    }
     viewModelOf(::HomeViewModel)
     viewModelOf(::DetailsViewModel)
 }

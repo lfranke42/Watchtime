@@ -2,10 +2,11 @@ package de.htwk.watchtime.data.db
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Index
 import androidx.room.PrimaryKey
 
 @Entity(
-    tableName="userWatchtime",
+    tableName = "userWatchtime",
     foreignKeys = [ForeignKey(
         entity = SeriesDbEntry::class,
         parentColumns = arrayOf("seriesId"),
@@ -16,7 +17,11 @@ import androidx.room.PrimaryKey
         parentColumns = arrayOf("episodeId"),
         childColumns = arrayOf("episodeId"),
         onDelete = ForeignKey.CASCADE
-    )]
+    )],
+    indices = [
+        Index(value = ["seriesId"]),
+        Index(value = ["episodeId"]),
+    ]
 )
 data class UserWatchtimeDbEntry(
     @PrimaryKey(autoGenerate = true)

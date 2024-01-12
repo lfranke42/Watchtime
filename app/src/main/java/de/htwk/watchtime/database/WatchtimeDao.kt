@@ -11,9 +11,9 @@ import de.htwk.watchtime.data.db.UserWatchtimeDbEntry
 @Dao
 interface WatchtimeDao {
     @Query("SELECT * FROM series WHERE seriesId == :seriesId")
-    suspend fun getSeries(seriesId: Int): SeriesDbEntry
+    suspend fun getSeries(seriesId: Int): SeriesDbEntry?
     @Query("SELECT * FROM episodes WHERE episodeId == :episodeId")
-    suspend fun getEpisode(episodeId: Int): EpisodeDbEntry
+    suspend fun getEpisode(episodeId: Int): EpisodeDbEntry?
     @Query("SELECT episodeId FROM userwatchtime WHERE seriesId == :seriesId")
     suspend fun getWatchedEpisodeIds(seriesId: Int): List<Int>
 
