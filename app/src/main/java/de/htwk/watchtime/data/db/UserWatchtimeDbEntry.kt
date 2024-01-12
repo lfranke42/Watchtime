@@ -4,6 +4,7 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import java.util.Date
 
 @Entity(
     tableName = "userWatchtime",
@@ -25,7 +26,8 @@ import androidx.room.PrimaryKey
 )
 data class UserWatchtimeDbEntry(
     @PrimaryKey(autoGenerate = true)
-    val watchtimeEntry: Int,
+    val watchtimeEntry: Int? = null,
     val seriesId: Int,
     val episodeId: Int,
+    val dateWatched: Date
 )

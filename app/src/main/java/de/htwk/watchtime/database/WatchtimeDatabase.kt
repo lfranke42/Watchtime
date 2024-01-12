@@ -9,7 +9,7 @@ import de.htwk.watchtime.data.db.UserWatchtimeDbEntry
 
 @Database(
     entities = [SeriesDbEntry::class, EpisodeDbEntry::class, UserWatchtimeDbEntry::class],
-    version = 1
+    version = 2
 )
 @TypeConverters(Converters::class)
 abstract class WatchtimeDatabase : RoomDatabase() {

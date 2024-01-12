@@ -33,7 +33,7 @@ val appModule = module {
             androidApplication(),
             WatchtimeDatabase::class.java,
             "watchtime-database"
-        ).build()
+        ).fallbackToDestructiveMigration().build()
     }
     single<WatchtimeDao> {
         val database = get<WatchtimeDatabase>()

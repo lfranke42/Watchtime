@@ -1,5 +1,6 @@
 package de.htwk.watchtime.database
 
+import android.icu.util.Calendar
 import de.htwk.watchtime.data.Episode
 import de.htwk.watchtime.data.Series
 import de.htwk.watchtime.data.db.EpisodeDbEntry
@@ -12,7 +13,7 @@ interface WatchtimeRepository {
     suspend fun getWatchedEpisodeIds(seriesId: Int): List<Int>
     suspend fun insertNewEpisode(episode: Episode, seriesId: Int)
     suspend fun insertSeries(series: Series)
-    suspend fun insertWatchtimeEntry(watchtimeEntry: UserWatchtimeDbEntry)
+    suspend fun insertWatchtimeEntry(seriesId: Int, episodeId: Int)
     suspend fun deleteWatchtimeEntry(watchtimeEntry: UserWatchtimeDbEntry)
 
 }
@@ -38,7 +39,6 @@ class WatchtimeRepositoryImpl(private val watchtimeDataSource: LocalWatchtimeDat
             seriesId = seriesId,
             seasonNumber = episode.seasonNumber,
             runtime = episode.runtime,
-            dateWatched = null
         )
         watchtimeDataSource.insertNewEpisode(dbEpisode)
     }
@@ -51,7 +51,12 @@ class WatchtimeRepositoryImpl(private val watchtimeDataSource: LocalWatchtimeDat
         watchtimeDataSource.insertSeries(dbSeries)
     }
 
-    override suspend fun insertWatchtimeEntry(watchtimeEntry: UserWatchtimeDbEntry) {
+    override suspend fun insertWatchtimeEntry(seriesId: Int, episodeId: Int) {
+        val watchtimeEntry = UserWatchtimeDbEntry(
+            seriesId = seriesId,
+            episodeId = episodeId,
+            dateWatched = Calendar.getInstance().time
+        )
         watchtimeDataSource.insertWatchtimeEntry(watchtimeEntry)
     }
 

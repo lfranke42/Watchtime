@@ -63,7 +63,41 @@ class DetailsViewModel(
     }
 
     fun selectSeason(season: Int) {
-        /* TODO: fetch season watch status from DB and update checkbox accordingly */
+        val episodeIds = seriesDetails.value.seriesDetails.episodes
+            .filter { it.seasonNumber == season }
+            .map { it.id }
+
+        viewModelScope.launch {
+            val watchedEpisodeIds =
+                watchtimeRepository.getWatchedEpisodeIds(seriesDetails.value.seriesDetails.id)
+
+            episodeIds.forEach { episodeId ->
+                if (!watchedEpisodeIds.contains(episodeId)) {
+                    return@forEach
+                }
+
+                _detailsScreenUiState.update { currentState ->
+                    currentState.copy(
+                        episodesWatched = currentState.episodesWatched + episodeId
+                    )
+                }
+            }
+
+            if (episodeIds.toSet() == watchedEpisodeIds.toSet()) {
+                _detailsScreenUiState.update { currentState ->
+                    currentState.copy(
+                        seasonCompleted = true
+                    )
+                }
+            } else {
+                _detailsScreenUiState.update { currentState ->
+                    currentState.copy(
+                        seasonCompleted = false
+                    )
+                }
+            }
+        }
+
         _detailsScreenUiState.update { currentState ->
             currentState.copy(selectedSeason = season, bottomSheetVisible = false)
         }
@@ -90,8 +124,13 @@ class DetailsViewModel(
             }
             Log.i("DetailsViewModel", "Episode $episodeId watched")
 
-            val seasonNumber = seriesDetails.value.seriesDetails.episodes.find { it.id == episodeId }
+            val seasonNumber =
+                seriesDetails.value.seriesDetails.episodes.find { it.id == episodeId }
             Log.i("DetailsViewModel", "Belonging to season number $seasonNumber")
+
+            viewModelScope.launch {
+                watchtimeRepository.insertWatchtimeEntry(episodeId, seriesId)
+            }
             /* TODO: DB update */
         } else {
             _detailsScreenUiState.update { currentState ->
