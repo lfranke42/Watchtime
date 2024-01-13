@@ -15,7 +15,7 @@ interface WatchtimeRepository {
     suspend fun insertSeries(series: Series)
     suspend fun insertWatchtimeEntry(seriesId: Int, episodeId: Int)
     suspend fun deleteWatchtimeEntry(seriesId: Int, episodeId: Int)
-
+    suspend fun updateSeriesCompletion(seriesId: Int, completed: Boolean)
 }
 
 class WatchtimeRepositoryImpl(private val watchtimeDataSource: LocalWatchtimeDataSource) :
@@ -62,5 +62,9 @@ class WatchtimeRepositoryImpl(private val watchtimeDataSource: LocalWatchtimeDat
 
     override suspend fun deleteWatchtimeEntry(seriesId: Int, episodeId: Int) {
         watchtimeDataSource.deleteWatchtimeEntry(seriesId, episodeId)
+    }
+
+    override suspend fun updateSeriesCompletion(seriesId: Int, completed: Boolean) {
+        watchtimeDataSource.updateSeriesCompletion(seriesId, completed)
     }
 }

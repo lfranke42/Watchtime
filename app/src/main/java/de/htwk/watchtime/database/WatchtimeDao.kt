@@ -29,4 +29,7 @@ interface WatchtimeDao {
 
     @Query("DELETE FROM userWatchtime WHERE seriesId == :seriesId AND episodeId == :episodeId ")
     suspend fun deleteWatchtimeEntry(seriesId: Int, episodeId: Int)
+
+    @Query("UPDATE series SET seriesCompleted = :completed WHERE seriesId == :seriesId")
+    suspend fun updateSeriesCompletion(seriesId: Int, completed: Boolean)
 }

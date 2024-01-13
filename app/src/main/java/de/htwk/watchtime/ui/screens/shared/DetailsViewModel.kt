@@ -243,10 +243,17 @@ class DetailsViewModel(
     private fun checkIfSeriesIsCompleted() {
         val watchedEpisodes = uiState.value.episodesWatched
         val allEpisodeIds = uiState.value.seriesDetails.episodes.map { it.id }
+        val newCompletionState = watchedEpisodes.containsAll(allEpisodeIds)
+
         _detailsScreenUiState.update { currentState ->
             currentState.copy(
-                seriesCompleted = watchedEpisodes.containsAll(allEpisodeIds)
+                seriesCompleted = newCompletionState
             )
+        }
+
+        // TODO: Optimize, so that DB is only updated if value actually changes
+        viewModelScope.launch {
+            watchtimeRepository.updateSeriesCompletion(seriesId, newCompletionState)
         }
     }
 }
