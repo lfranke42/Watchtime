@@ -32,4 +32,10 @@ interface WatchtimeDao {
 
     @Query("UPDATE series SET seriesCompleted = :completed WHERE seriesId == :seriesId")
     suspend fun updateSeriesCompletion(seriesId: Int, completed: Boolean)
+
+    @Query("SELECT user.seriesId " +
+            "FROM userWatchtime as user JOIN series " +
+            "WHERE user.seriesId == series.seriesId and series.seriesCompleted == 0 " +
+            "GROUP BY user.seriesId")
+    suspend fun getStartedSeriesIds(): List<Int>
 }

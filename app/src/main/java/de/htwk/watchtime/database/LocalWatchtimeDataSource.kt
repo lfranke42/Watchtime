@@ -13,6 +13,7 @@ interface LocalWatchtimeDataSource {
     suspend fun insertWatchtimeEntry(watchtimeEntry: UserWatchtimeDbEntry)
     suspend fun deleteWatchtimeEntry(seriesId: Int, episodeId: Int)
     suspend fun updateSeriesCompletion(seriesId: Int, completed: Boolean)
+    suspend fun getStartedSeriesIds(): List<Int>
 }
 
 class LocalWatchtimeDataSourceImpl(private val watchtimeDao: WatchtimeDao) :
@@ -49,5 +50,8 @@ class LocalWatchtimeDataSourceImpl(private val watchtimeDao: WatchtimeDao) :
         watchtimeDao.updateSeriesCompletion(seriesId = seriesId, completed = completed)
     }
 
+    override suspend fun getStartedSeriesIds(): List<Int> {
+        return watchtimeDao.getStartedSeriesIds()
+    }
 }
 

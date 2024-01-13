@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import de.htwk.watchtime.data.Series
 import de.htwk.watchtime.data.placeholder.placeHolderSeriesList
+import de.htwk.watchtime.data.toSeries
+import de.htwk.watchtime.data.uiState.HomeScreenUiState
 import de.htwk.watchtime.database.WatchtimeRepository
 import de.htwk.watchtime.network.SeriesRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,27 +17,52 @@ import kotlinx.coroutines.launch
 class HomeViewModel(
     private val seriesRepository: SeriesRepository,
     private val watchtimeRepository: WatchtimeRepository,
-): ViewModel() {
+) : ViewModel() {
 
-    private val _series: MutableStateFlow<List<Series>> = MutableStateFlow(placeHolderSeriesList)
-    val series: StateFlow<List<Series>> = _series.asStateFlow()
+    private val _homeScreenUiState: MutableStateFlow<HomeScreenUiState> = MutableStateFlow(
+        HomeScreenUiState(
+            series = placeHolderSeriesList,
+            continueWatchingList = placeHolderSeriesList
+        )
+    )
+    val uiState: StateFlow<HomeScreenUiState> = _homeScreenUiState.asStateFlow()
 
     init {
         loadSeries()
+        updateContinueWatchingList()
     }
 
     private fun loadSeries() {
         viewModelScope.launch {
-            _series.update {
-                seriesRepository.getSeries()
+            _homeScreenUiState.update { currentState ->
+                currentState.copy(
+                    series = seriesRepository.getSeries()
+                )
             }
 
             // Check if series already in DB, if not add it
-            series.value.forEach { series ->
+            uiState.value.series.forEach { series ->
                 val dbSeriesResult = watchtimeRepository.getSeries(series.id)
                 if (dbSeriesResult == null) {
                     watchtimeRepository.insertSeries(series)
                 }
+            }
+        }
+    }
+
+    fun updateContinueWatchingList() {
+        viewModelScope.launch {
+            val startedSeriesIds = watchtimeRepository.getStartedSeriesIds()
+            val startedSeries = mutableListOf<Series>()
+
+            startedSeriesIds.forEach { seriesId ->
+                startedSeries.add(seriesRepository.getSeriesDetails(seriesId).toSeries())
+            }
+
+            _homeScreenUiState.update { currentState ->
+                currentState.copy(
+                    continueWatchingList = startedSeries
+                )
             }
         }
     }
