@@ -118,7 +118,6 @@ fun DetailsScreen(
                 .fillMaxSize()
                 .padding(16.dp),
         ) {
-
             LazyColumn {
                 item {
                     CardHeader(

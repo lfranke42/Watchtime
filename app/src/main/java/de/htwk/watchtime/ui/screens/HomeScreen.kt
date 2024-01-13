@@ -119,7 +119,7 @@ fun ContinueWatchingCarousel(
     onCardTap: (seriesId: Int) -> Unit = {}
 ) {
     LazyRow(
-        modifier = modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)
+        modifier = modifier.fillMaxWidth().padding(start = 2.dp, end = 2.dp), horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         items(continueWatchingList) { series ->
             CarouselCard(series, onCardTap = onCardTap)
