@@ -44,12 +44,12 @@ class SeriesRepositoryImpl(
 
         seriesDetails.seasons.forEach { seasonDto ->
             seasonList[seasonDto.seasonNumber] = (
-                Season(
-                    id = seasonDto.id,
-                    seasonNumber = seasonDto.seasonNumber,
-                    episodeIds = mutableListOf(),
-                )
-            )
+                    Season(
+                        id = seasonDto.id,
+                        seasonNumber = seasonDto.seasonNumber,
+                        episodeIds = mutableListOf(),
+                    )
+                    )
         }
 
         seriesDetails.episodes.forEach { episodeDto ->
@@ -75,13 +75,16 @@ class SeriesRepositoryImpl(
             )
         }
 
+        val filteredSeasonList =
+            seasonList.filterKeys { seasonList[it]?.episodeIds?.isNotEmpty() ?: false }
+
         return ExtendedSeries(
             name = seriesDetails.name,
             id = seriesDetails.id,
             year = seriesDetails.year?.substring(0, 4) ?: "unknown",
             imageUrl = seriesDetails.imageUrl,
             episodes = episodeList,
-            seasons = seasonList.toSortedMap(),
+            seasons = filteredSeasonList.toSortedMap(),
             description = seriesDetails.description,
             genres = genreList,
         )
