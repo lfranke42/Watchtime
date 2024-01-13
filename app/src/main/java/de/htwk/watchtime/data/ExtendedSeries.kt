@@ -10,3 +10,12 @@ data class ExtendedSeries(
     val description: String?,
     val genres: List<Genre>,
 )
+
+fun ExtendedSeries.toSeries(): Series {
+    return Series(
+        name = name,
+        id = id,
+        year = year,
+        imageUrl = imageUrl
+    )
+}

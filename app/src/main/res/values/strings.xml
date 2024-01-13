@@ -11,7 +11,7 @@
     <string name="navigate_stats">Navigate to stats</string>
     <string name="navigate_details">Navigate to details</string>
 
-    <string name="home_screen_popular_title">Popular</string>
+    <string name="home_screen_recommended_title">Recommended</string>
     <string name="home_screen_continue_watching_title">Continue Watching</string>
     <string name="home_screen_image_desc">Series Artwork</string>
 

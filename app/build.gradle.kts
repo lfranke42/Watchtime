@@ -57,6 +57,9 @@ android {
         propertiesFileName = "secrets.properties"
         defaultPropertiesFileName = "secrets.defaults.properties"
     }
+    ksp {
+        arg("room.schemaLocation", "$projectDir/schemas")
+    }
 }
 
 dependencies {
@@ -83,6 +86,10 @@ dependencies {
     implementation(libs.koin.compose)
 
     implementation(libs.coil.compose)
+
+    implementation(libs.room.runtime)
+    implementation(libs.room.ktx)
+    ksp(libs.room.ksp)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)
