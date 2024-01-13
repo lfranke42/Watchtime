@@ -14,7 +14,7 @@ interface WatchtimeRepository {
     suspend fun insertNewEpisode(episode: Episode, seriesId: Int)
     suspend fun insertSeries(series: Series)
     suspend fun insertWatchtimeEntry(seriesId: Int, episodeId: Int)
-    suspend fun deleteWatchtimeEntry(watchtimeEntry: UserWatchtimeDbEntry)
+    suspend fun deleteWatchtimeEntry(seriesId: Int, episodeId: Int)
 
 }
 
@@ -60,7 +60,7 @@ class WatchtimeRepositoryImpl(private val watchtimeDataSource: LocalWatchtimeDat
         watchtimeDataSource.insertWatchtimeEntry(watchtimeEntry)
     }
 
-    override suspend fun deleteWatchtimeEntry(watchtimeEntry: UserWatchtimeDbEntry) {
-        watchtimeDataSource.deleteWatchtimeEntry(watchtimeEntry)
+    override suspend fun deleteWatchtimeEntry(seriesId: Int, episodeId: Int) {
+        watchtimeDataSource.deleteWatchtimeEntry(seriesId, episodeId)
     }
 }

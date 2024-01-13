@@ -1,6 +1,5 @@
 package de.htwk.watchtime.ui.screens.shared
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -44,11 +43,13 @@ class DetailsViewModel(
     private fun loadSeriesDetails() {
         viewModelScope.launch {
             val seriesDetails = seriesRepository.getSeriesDetails(seriesId)
+            val episodeIdsWatched = watchtimeRepository.getWatchedEpisodeIds(seriesId)
 
             _detailsScreenUiState.update { currentState ->
                 currentState.copy(
                     seriesDetails = seriesDetails,
-                    selectedSeason = seriesDetails.seasons.keys.first()
+                    selectedSeason = seriesDetails.seasons.keys.first(),
+                    episodesWatched = episodeIdsWatched.toSet()
                 )
             }
 
@@ -59,17 +60,17 @@ class DetailsViewModel(
                     watchtimeRepository.insertNewEpisode(episode, seriesId)
                 }
             }
+            checkIfSeasonIsCompleted()
+            checkIfSeriesIsCompleted()
         }
     }
 
-    fun selectSeason(season: Int) {
-        val episodeIds = seriesDetails.value.seriesDetails.episodes
-            .filter { it.seasonNumber == season }
-            .map { it.id }
+    fun selectSeason(seasonNumber: Int) {
+        val episodeIds =
+            seriesDetails.value.seriesDetails.seasons[seasonNumber]?.episodeIds ?: listOf()
 
         viewModelScope.launch {
-            val watchedEpisodeIds =
-                watchtimeRepository.getWatchedEpisodeIds(seriesDetails.value.seriesDetails.id)
+            val watchedEpisodeIds = watchtimeRepository.getWatchedEpisodeIds(seriesId)
 
             episodeIds.forEach { episodeId ->
                 if (!watchedEpisodeIds.contains(episodeId)) {
@@ -83,23 +84,10 @@ class DetailsViewModel(
                 }
             }
 
-            if (episodeIds.toSet() == watchedEpisodeIds.toSet()) {
-                _detailsScreenUiState.update { currentState ->
-                    currentState.copy(
-                        seasonCompleted = true
-                    )
-                }
-            } else {
-                _detailsScreenUiState.update { currentState ->
-                    currentState.copy(
-                        seasonCompleted = false
-                    )
-                }
-            }
+            checkIfSeasonIsCompleted()
         }
-
         _detailsScreenUiState.update { currentState ->
-            currentState.copy(selectedSeason = season, bottomSheetVisible = false)
+            currentState.copy(selectedSeason = seasonNumber, bottomSheetVisible = false)
         }
     }
 
@@ -122,55 +110,62 @@ class DetailsViewModel(
                     episodesWatched = currentState.episodesWatched + episodeId
                 )
             }
-            Log.i("DetailsViewModel", "Episode $episodeId watched")
-
-            val seasonNumber =
-                seriesDetails.value.seriesDetails.episodes.find { it.id == episodeId }
-            Log.i("DetailsViewModel", "Belonging to season number $seasonNumber")
-
             viewModelScope.launch {
-                watchtimeRepository.insertWatchtimeEntry(episodeId, seriesId)
+                watchtimeRepository.insertWatchtimeEntry(seriesId = seriesId, episodeId = episodeId)
+                checkIfSeasonIsCompleted()
+                checkIfSeriesIsCompleted()
             }
-            /* TODO: DB update */
-        } else {
+            return
+        }
+
+        _detailsScreenUiState.update { currentState ->
+            currentState.copy(
+                episodesWatched = currentState.episodesWatched - episodeId
+            )
+        }
+        viewModelScope.launch {
+            watchtimeRepository.deleteWatchtimeEntry(seriesId = seriesId, episodeId = episodeId)
+            // If item gets removed we can assume that season isn't completed
             _detailsScreenUiState.update { currentState ->
                 currentState.copy(
-                    episodesWatched = currentState.episodesWatched - episodeId
+                    seasonCompleted = false
                 )
             }
-            /* TODO: DB update */
         }
-        /* TODO: Check in DB if whole season is watched */
     }
 
     fun toggleSeasonWatched(season: Season, completed: Boolean) {
         if (!completed) {
             _detailsScreenUiState.update { currentState ->
-                val seriesEpisodes =
-                    currentState.seriesDetails.episodes.filter { it.seasonNumber == season.seasonNumber }
-                val episodeIds = seriesEpisodes.map { it.id }
-
                 currentState.copy(
-                    episodesWatched = currentState.episodesWatched + episodeIds.toSet(),
+                    episodesWatched = currentState.episodesWatched + season.episodeIds.toSet(),
                     seasonCompleted = true
                 )
-
             }
-            Log.i("check", "season: ${season.seasonNumber}")
-            Log.i("check", "completed: ${seriesDetails.value.episodesWatched}")
-            /* TODO: DB update */
-        } else {
-            _detailsScreenUiState.update { currentState ->
-                val seriesEpisodes =
-                    currentState.seriesDetails.episodes.filter { it.seasonNumber == season.seasonNumber }
-                val episodeIds = seriesEpisodes.map { it.id }
+            viewModelScope.launch {
+                season.episodeIds.forEach { episodeId ->
+                    watchtimeRepository.insertWatchtimeEntry(
+                        seriesId = seriesId,
+                        episodeId = episodeId
+                    )
+                }
+            }
+            return
+        }
 
-                currentState.copy(
-                    episodesWatched = currentState.episodesWatched - episodeIds.toSet(),
-                    seasonCompleted = false
+        _detailsScreenUiState.update { currentState ->
+            currentState.copy(
+                episodesWatched = currentState.episodesWatched - season.episodeIds.toSet(),
+                seasonCompleted = false
+            )
+        }
+        viewModelScope.launch {
+            season.episodeIds.forEach { episodeId ->
+                watchtimeRepository.deleteWatchtimeEntry(
+                    seriesId = seriesId,
+                    episodeId = episodeId
                 )
             }
-            /* TODO: DB update */
         }
     }
 
@@ -192,6 +187,8 @@ class DetailsViewModel(
 
     fun toggleSeriesWatched() {
         val seriesCompleted = seriesDetails.value.seriesCompleted
+        val episodeList = seriesDetails.value.seriesDetails.episodes
+        val episodeIdList = episodeList.map { it.id }
 
         if (seriesCompleted) {
             _detailsScreenUiState.update { currentState ->
@@ -200,12 +197,18 @@ class DetailsViewModel(
                     seriesCompleted = false
                 )
             }
-            /* TODO: DB update */
+            viewModelScope.launch {
+                episodeIdList.forEach { episodeId ->
+                    watchtimeRepository.deleteWatchtimeEntry(
+                        seriesId = seriesId,
+                        episodeId = episodeId
+                    )
+                }
+                checkIfSeasonIsCompleted()
+                checkIfSeriesIsCompleted()
+            }
             return
         }
-
-        val episodeList = seriesDetails.value.seriesDetails.episodes
-        val episodeIdList = episodeList.map { it.id }
 
         _detailsScreenUiState.update { currentState ->
             currentState.copy(
@@ -213,6 +216,37 @@ class DetailsViewModel(
                 seriesCompleted = true
             )
         }
-        /* TODO: DB update */
+        viewModelScope.launch {
+            episodeIdList.forEach { episodeId ->
+                watchtimeRepository.insertWatchtimeEntry(seriesId = seriesId, episodeId = episodeId)
+            }
+            checkIfSeasonIsCompleted()
+            checkIfSeriesIsCompleted()
+        }
+    }
+
+    private suspend fun checkIfSeasonIsCompleted() {
+        val watchedEpisodes = watchtimeRepository.getWatchedEpisodeIds(seriesId)
+        val currentSeason = seriesDetails.value.selectedSeason
+        val episodesOfSeason =
+            seriesDetails.value.seriesDetails.seasons[currentSeason]?.episodeIds
+                ?: emptyList()
+
+        val seasonCompleted = watchedEpisodes.containsAll(episodesOfSeason)
+        _detailsScreenUiState.update { currentState ->
+            currentState.copy(
+                seasonCompleted = seasonCompleted
+            )
+        }
+    }
+
+    private suspend fun checkIfSeriesIsCompleted() {
+        val watchedEpisodes = watchtimeRepository.getWatchedEpisodeIds(seriesId)
+        val allEpisodeIds = seriesDetails.value.seriesDetails.episodes.map { it.id }
+        _detailsScreenUiState.update { currentState ->
+            currentState.copy(
+                seriesCompleted = watchedEpisodes.containsAll(allEpisodeIds)
+            )
+        }
     }
 }

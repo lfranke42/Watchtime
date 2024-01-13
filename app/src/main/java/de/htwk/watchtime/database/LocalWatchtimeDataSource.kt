@@ -3,7 +3,6 @@ package de.htwk.watchtime.database
 import de.htwk.watchtime.data.db.EpisodeDbEntry
 import de.htwk.watchtime.data.db.SeriesDbEntry
 import de.htwk.watchtime.data.db.UserWatchtimeDbEntry
-import java.util.Date
 
 interface LocalWatchtimeDataSource {
     suspend fun getSeries(seriesId: Int): SeriesDbEntry?
@@ -12,9 +11,7 @@ interface LocalWatchtimeDataSource {
     suspend fun insertSeries(series: SeriesDbEntry)
     suspend fun insertNewEpisode(episode: EpisodeDbEntry)
     suspend fun insertWatchtimeEntry(watchtimeEntry: UserWatchtimeDbEntry)
-    suspend fun deleteWatchtimeEntry(watchtimeEntry: UserWatchtimeDbEntry)
-    suspend fun modifyWatchtimeDate(episodeId: Int, dateWatched: Date)
-
+    suspend fun deleteWatchtimeEntry(seriesId: Int, episodeId: Int)
 }
 
 class LocalWatchtimeDataSourceImpl(private val watchtimeDao: WatchtimeDao) :
@@ -43,12 +40,8 @@ class LocalWatchtimeDataSourceImpl(private val watchtimeDao: WatchtimeDao) :
         watchtimeDao.insertWatchtimeEntry(watchtimeEntry)
     }
 
-    override suspend fun deleteWatchtimeEntry(watchtimeEntry: UserWatchtimeDbEntry) {
-        watchtimeDao.deleteWatchtimeEntry(watchtimeEntry)
-    }
-
-    override suspend fun modifyWatchtimeDate(episodeId: Int, dateWatched: Date) {
-        TODO("Not yet implemented")
+    override suspend fun deleteWatchtimeEntry(seriesId: Int, episodeId: Int) {
+        watchtimeDao.deleteWatchtimeEntry(seriesId, episodeId)
     }
 }
 
