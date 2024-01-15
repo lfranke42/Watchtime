@@ -78,6 +78,7 @@ dependencies {
 
     implementation(libs.moshi.core)
     implementation(libs.moshi.adapters)
+    implementation(libs.androidx.room.ktx)
     ksp(libs.moshi.annotationProcessor)
 
     implementation(libs.koin.android)

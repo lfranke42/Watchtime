@@ -9,6 +9,8 @@ import de.htwk.watchtime.data.Series
 interface SeriesRepository {
     suspend fun getSeries(): List<Series>
     suspend fun getSeriesDetails(id: Int): ExtendedSeries
+
+    suspend fun searchSeries(name: String): List<Series>
 }
 
 class SeriesRepositoryImpl(
@@ -28,6 +30,27 @@ class SeriesRepositoryImpl(
                     id = seriesDto.id,
                 )
             )
+        }
+        return seriesList
+    }
+
+    override suspend fun searchSeries(name: String): List<Series> {
+        val seriesDtoList = dataSource.searchSeries(name)
+        val seriesList = mutableListOf<Series>()
+
+        seriesDtoList.forEach { seriesDto ->
+            if (seriesDto.type == "series"){
+                val image = seriesDto.imageUrl?.removePrefix("https://artworks.thetvdb.com")
+                seriesList.add(
+                    Series(
+                        name = seriesDto.name,
+                        year = seriesDto.year?.substring(0,4) ?: "unknown",
+                        imageUrl = image,
+                        id = seriesDto.id,
+                    )
+                )
+            }
+
         }
         return seriesList
     }
@@ -56,7 +79,7 @@ class SeriesRepositoryImpl(
             episodeList.add(
                 Episode(
                     id = episodeDto.id,
-                    name = episodeDto.name,
+                    name = episodeDto.name ?: "unknown",
                     seasonNumber = episodeDto.seasonNumber,
                     episodeNumber = episodeDto.episodeNumber,
                     runtime = episodeDto.runtime ?: 0,

@@ -3,12 +3,16 @@ package de.htwk.watchtime.network
 import android.util.Log
 import de.htwk.watchtime.BuildConfig
 import de.htwk.watchtime.network.dto.LoginRequest
+import de.htwk.watchtime.network.dto.SearchDto
 import de.htwk.watchtime.network.dto.SeriesDto
 import de.htwk.watchtime.network.dto.SeriesExtendedDto
 
 interface RemoteSeriesDataSource {
     suspend fun getSeries(): List<SeriesDto>
     suspend fun getSeriesDetails(id: Int): SeriesExtendedDto?
+    suspend fun searchSeries(name: String): List<SearchDto>
+
+
 }
 
 class RemoteSeriesDataSourceImpl(
@@ -26,13 +30,32 @@ class RemoteSeriesDataSourceImpl(
 
         val seriesDetailsResponse = tvdbApi.getSeriesDetails(authHeader = token, id = id)
         val responseBody = seriesDetailsResponse.body()
-
         return if (seriesDetailsResponse.isSuccessful && responseBody != null)
             responseBody.data
         else {
             null
         }
     }
+
+    override suspend fun searchSeries(name: String): List<SearchDto>{
+        var token = sessionManager.fetchAuthToken()
+        if (token == null) {
+            token = login()
+            if (token == null) {
+                throw Exception()
+            }
+        }
+
+        val searchResponse = tvdbApi.searchSeries(authHeader = token, name = name)
+        val responseBody = searchResponse.body()
+
+        return if(searchResponse.isSuccessful && responseBody != null)
+         responseBody.data
+        else{
+           listOf()
+        }
+    }
+
 
     override suspend fun getSeries(): List<SeriesDto> {
         var token = sessionManager.fetchAuthToken()

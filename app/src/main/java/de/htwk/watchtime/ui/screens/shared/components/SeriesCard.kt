@@ -43,7 +43,7 @@ fun SeriesCard(
     series: Series,
     onTap: (seriesId: Int) -> Unit = {},
 
-) {
+    ) {
     var contentScale by remember {
         mutableStateOf(ContentScale.Crop)
     }
