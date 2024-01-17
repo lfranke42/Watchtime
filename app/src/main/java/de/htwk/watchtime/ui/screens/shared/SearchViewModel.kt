@@ -3,12 +3,16 @@ package de.htwk.watchtime.ui.screens.shared
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import de.htwk.watchtime.data.Series
+import de.htwk.watchtime.database.WatchtimeRepository
 import de.htwk.watchtime.network.SeriesRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class SearchViewModel(private val seriesRepository: SeriesRepository) : ViewModel() {
+class SearchViewModel(
+    private val seriesRepository: SeriesRepository,
+    private val watchtimeRepository: WatchtimeRepository
+) : ViewModel() {
 
     private val _searchQuery = MutableStateFlow("")
     val searchQuery: StateFlow<String> get() = _searchQuery
@@ -37,6 +41,13 @@ class SearchViewModel(private val seriesRepository: SeriesRepository) : ViewMode
                             year = series.year,
                             imageUrl = series.imageUrl
                         )
+                    }
+                    // Check if series already in DB, if not add it
+                    _searchResult.value.forEach { series ->
+                        val dbSeriesResult = watchtimeRepository.getSeries(series.id)
+                        if (dbSeriesResult == null) {
+                            watchtimeRepository.insertSeries(series)
+                        }
                     }
                 } finally {
                     _isSearching.value = false

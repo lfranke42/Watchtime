@@ -44,7 +44,7 @@ fun CarouselCard(
                 textAlign = TextAlign.Center
             )
             AsyncImage(
-                model = "https://artworks.thetvdb.com${series.imageUrl}",
+                model = series.imageUrl,
                 contentDescription = stringResource(id = R.string.home_screen_image_desc),
                 contentScale = ContentScale.Crop
             )

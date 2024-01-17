@@ -69,7 +69,7 @@ fun SeriesCard(
                 color = MaterialTheme.colorScheme.surfaceColorAtElevation(4.dp)
             ) {
                 AsyncImage(
-                    model = "https://artworks.thetvdb.com${series.imageUrl}",
+                    model = series.imageUrl,
                     contentDescription = stringResource(id = R.string.home_screen_image_desc),
                     fallback = painterResource(id = R.drawable.outline_movie_24),
                     error = painterResource(id = R.drawable.outline_movie_24),

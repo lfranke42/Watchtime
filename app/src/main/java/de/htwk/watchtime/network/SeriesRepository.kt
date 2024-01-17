@@ -22,11 +22,20 @@ class SeriesRepositoryImpl(
         val seriesList = mutableListOf<Series>()
 
         seriesDtoList.forEach { seriesDto ->
+
+            val imageUrlContainsPrefix = seriesDto.imageUrl?.contains("https://artworks.thetvdb.com") ?: true
+
+            val imageUrl = if (!imageUrlContainsPrefix) {
+                seriesDto.imageUrl?.let { "https://artworks.thetvdb.com$it" } ?: ""
+            } else {
+                seriesDto.imageUrl ?: ""
+            }
+
             seriesList.add(
                 Series(
                     name = seriesDto.name,
                     year = seriesDto.year?.substring(0, 4) ?: "unknown",
-                    imageUrl = seriesDto.imageUrl,
+                    imageUrl = imageUrl,
                     id = seriesDto.id,
                 )
             )
@@ -40,12 +49,11 @@ class SeriesRepositoryImpl(
 
         seriesDtoList.forEach { seriesDto ->
             if (seriesDto.type == "series"){
-                val image = seriesDto.imageUrl?.removePrefix("https://artworks.thetvdb.com")
                 seriesList.add(
                     Series(
                         name = seriesDto.name,
                         year = seriesDto.year?.substring(0,4) ?: "unknown",
-                        imageUrl = image,
+                        imageUrl = seriesDto.imageUrl,
                         id = seriesDto.id,
                     )
                 )

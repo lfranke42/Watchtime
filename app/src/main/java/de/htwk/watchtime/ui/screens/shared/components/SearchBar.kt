@@ -19,7 +19,6 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -28,12 +27,8 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import de.htwk.watchtime.R
-import de.htwk.watchtime.data.ExtendedSeries
-import de.htwk.watchtime.data.Series
-import de.htwk.watchtime.network.SeriesRepository
 import de.htwk.watchtime.ui.screens.shared.SearchViewModel
 
 
@@ -120,55 +115,4 @@ fun RoundedSearchBar(
         }
     }
 }
-
-@Preview
-@Composable
-fun RoundedSearchBarPreview() {
-    val dummySeriesRepository = object : SeriesRepository {
-        override suspend fun getSeries(): List<Series> {
-            return listOf(
-                Series(
-                    name = "Breaking Bad",
-                    id = 1,
-                    year = "2008",
-                    imageUrl = "https://example.com/breaking_bad_image.jpg"
-                )
-            )
-        }
-
-        override suspend fun getSeriesDetails(id: Int): ExtendedSeries {
-            return ExtendedSeries(
-                    name = "",
-                    id = 1,
-                    year = "",
-                    imageUrl = null,
-                    episodes = emptyList(),
-                    seasons = emptyMap(),
-                    description = null,
-                    genres = emptyList()
-                )
-
-        }
-
-        override suspend fun searchSeries(name: String): List<Series> {
-            return listOf(
-                Series(
-                name = "Breaking Bad",
-                id = 1,
-                year = "2008",
-                imageUrl = "https://example.com/breaking_bad_image.jpg"
-            ))
-
-        }
-
-    }
-    val viewModel = remember { SearchViewModel(dummySeriesRepository) }
-
-    RoundedSearchBar(
-        modifier = Modifier.fillMaxWidth(),
-        viewModel = viewModel,
-        onCardTap = {}
-    )
-}
-
 
