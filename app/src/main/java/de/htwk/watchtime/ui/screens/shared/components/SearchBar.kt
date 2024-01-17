@@ -10,8 +10,6 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -28,16 +26,18 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import de.htwk.watchtime.R
 import de.htwk.watchtime.data.ExtendedSeries
 import de.htwk.watchtime.data.Series
 import de.htwk.watchtime.network.SeriesRepository
 import de.htwk.watchtime.ui.screens.shared.SearchViewModel
 
 
-@OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun RoundedSearchBar(
     modifier: Modifier = Modifier,
@@ -64,17 +64,17 @@ fun RoundedSearchBar(
             .shadow(elevation = elevation, shape = RoundedCornerShape(35.dp))
     ) {
         TextField(
-            colors = TextFieldDefaults.textFieldColors(
+            colors = TextFieldDefaults.colors(
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent,
-                disabledIndicatorColor = Color.Transparent
+                disabledIndicatorColor = Color.Transparent,
             ),
             value = searchQuery,
             onValueChange = {
                 viewModel.setSearchQuery(it)
             },
             placeholder = {
-                Text("Search for a series...")
+                Text("Enter series name")
             },
             singleLine = true,
             keyboardOptions = KeyboardOptions(
@@ -87,10 +87,10 @@ fun RoundedSearchBar(
                 }
             ),
             leadingIcon = {
-                Icon(imageVector = Icons.Default.Search, contentDescription = null)
+                Icon(painter = painterResource(id = R.drawable.outline_search_24), contentDescription = null)
             },
             trailingIcon = {
-                if (isSearching) {
+                if (isSearching || searchQuery.isNotBlank()) {
                     IconButton(
                         onClick = {
                             viewModel.clearSearch()
@@ -98,8 +98,7 @@ fun RoundedSearchBar(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Close,
-                            contentDescription = null,
-                            tint = Color.Gray
+                            contentDescription = null
                         )
                     }
                 }
@@ -114,12 +113,8 @@ fun RoundedSearchBar(
                 modifier = Modifier
                     .fillMaxWidth()
             ) {
-                searchResult?.forEach { series ->
+                searchResult.forEach { series ->
                     SeriesCard(series = series, onTap = onCardTap)
-
-                } ?: run {
-                    // Serie nicht gefunden
-                    Text("Keine Serie gefunden für: $searchQuery")
                 }
             }
         }
@@ -129,14 +124,13 @@ fun RoundedSearchBar(
 @Preview
 @Composable
 fun RoundedSearchBarPreview() {
-
     val dummySeriesRepository = object : SeriesRepository {
         override suspend fun getSeries(): List<Series> {
             return listOf(
                 Series(
                     name = "Breaking Bad",
                     id = 1,
-                    year = "2008", // Beispieljahr
+                    year = "2008",
                     imageUrl = "https://example.com/breaking_bad_image.jpg"
                 )
             )
@@ -168,11 +162,8 @@ fun RoundedSearchBarPreview() {
         }
 
     }
-
-    // SearchViewModel mit der Dummy SeriesRepository-Instanz erstellen
     val viewModel = remember { SearchViewModel(dummySeriesRepository) }
 
-    // Deine RoundedSearchBar-Komponente für die Vorschau erstellen
     RoundedSearchBar(
         modifier = Modifier.fillMaxWidth(),
         viewModel = viewModel,
