@@ -2,6 +2,7 @@ package de.htwk.watchtime.network
 
 import de.htwk.watchtime.network.dto.LoginRequest
 import de.htwk.watchtime.network.dto.LoginResponse
+import de.htwk.watchtime.network.dto.SearchResponse
 import de.htwk.watchtime.network.dto.SeriesExtendedResponse
 import de.htwk.watchtime.network.dto.SeriesResponse
 import retrofit2.Response
@@ -31,6 +32,13 @@ interface TvdbApi {
         @Query("meta") meta: String = "episodes",
         @Query("short") short: Boolean = true,
     ): Response<SeriesExtendedResponse>
+
+    @GET("search")
+    suspend fun searchSeries(
+        @Header("Authorization") authHeader: String,
+        @Query("query") name: String
+
+    ): Response<SearchResponse>
 
 }
 

@@ -162,7 +162,7 @@ fun DetailsScreen(
                 itemsIndexed(seasonEpisodes) { index, episode ->
                     val checked = episodesWatched.contains(episode.id)
                     EpisodeRow(
-                        episodeTitle = episode.name,
+                        episodeTitle = episode.name ?: "unknown name",
                         checked = checked,
                         episodeNumber = index + 1,
                         onCheckChange = { watched ->

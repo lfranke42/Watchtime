@@ -12,6 +12,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import de.htwk.watchtime.ui.WatchtimeScreens
 
+
 val navigatableItems = listOf(
     WatchtimeScreens.Home,
     WatchtimeScreens.Search,
