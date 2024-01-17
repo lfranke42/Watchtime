@@ -58,7 +58,7 @@ fun DetailsScreen(
     modifier: Modifier = Modifier,
     viewModel: DetailsViewModel = koinViewModel()
 ) {
-    val detailsScreenUiState by viewModel.seriesDetails.collectAsState()
+    val detailsScreenUiState by viewModel.uiState.collectAsState()
 
     DetailsScreen(
         seriesDetails = detailsScreenUiState.seriesDetails,
@@ -118,7 +118,6 @@ fun DetailsScreen(
                 .fillMaxSize()
                 .padding(16.dp),
         ) {
-
             LazyColumn {
                 item {
                     CardHeader(

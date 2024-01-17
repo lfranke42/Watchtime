@@ -47,7 +47,7 @@ fun WatchtimeTopAppBar(
 private fun AppBarTitle() {
     Text(
         text = stringResource(id = R.string.app_name),
-        style = MaterialTheme.typography.titleLarge,
+        style = MaterialTheme.typography.headlineLarge,
     )
 }
 

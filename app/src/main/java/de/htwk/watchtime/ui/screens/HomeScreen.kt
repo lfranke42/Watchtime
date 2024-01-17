@@ -11,6 +11,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -31,11 +32,12 @@ fun HomeScreen(
     onCardTap: (seriesId: Int) -> Unit = {},
     viewModel: HomeViewModel = koinViewModel()
 ) {
-    val seriesList by viewModel.series.collectAsState()
+    val uiState by viewModel.uiState.collectAsState()
     HomeScreen(
-        recommendedSeries = seriesList,
-        continueWatchingList = seriesList,
+        recommendedSeries = uiState.series,
+        continueWatchingList = uiState.continueWatchingList,
         onCardTap = onCardTap,
+        refreshContinueWatching = { viewModel.updateContinueWatchingList() },
         modifier = modifier
     )
 }
@@ -45,8 +47,12 @@ fun HomeScreen(
     recommendedSeries: List<Series>,
     continueWatchingList: List<Series>,
     modifier: Modifier = Modifier,
-    onCardTap: (seriesId: Int) -> Unit = {}
+    onCardTap: (seriesId: Int) -> Unit = {},
+    refreshContinueWatching: () -> Unit = {}
 ) {
+    LaunchedEffect(Unit){
+        refreshContinueWatching()
+    }
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
@@ -54,14 +60,19 @@ fun HomeScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        item {
-            HomeScreenTitle(text = stringResource(id = R.string.home_screen_continue_watching_title))
+        if (continueWatchingList.isNotEmpty()) {
+            item {
+                HomeScreenTitle(text = stringResource(id = R.string.home_screen_continue_watching_title))
+            }
+            item {
+                ContinueWatchingCarousel(
+                    continueWatchingList = continueWatchingList,
+                    onCardTap = onCardTap
+                )
+            }
         }
         item {
-            ContinueWatchingCarousel(continueWatchingList = continueWatchingList, onCardTap = onCardTap)
-        }
-        item {
-            HomeScreenTitle(text = stringResource(id = R.string.home_screen_popular_title))
+            HomeScreenTitle(text = stringResource(id = R.string.home_screen_recommended_title))
         }
         items(recommendedSeries) { series ->
             SeriesCard(series = series, onTap = onCardTap)
@@ -88,7 +99,7 @@ fun ContinueWatchingCarousel(
     onCardTap: (seriesId: Int) -> Unit = {}
 ) {
     LazyRow(
-        modifier = modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)
+        modifier = modifier.fillMaxWidth().padding(start = 2.dp, end = 2.dp), horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         items(continueWatchingList) { series ->
             CarouselCard(series, onCardTap = onCardTap)

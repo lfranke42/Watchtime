@@ -17,7 +17,7 @@ ksp = "1.9.10-1.0.13"
 navigation = "2.7.6"
 koin = "3.5.0"
 secrets = "2.0.1"
-roomKtx = "2.6.1"
+room = "2.6.1"
 
 [libraries]
 core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
@@ -54,8 +54,12 @@ moshi-annotationProcessor = { module = "com.squareup.moshi:moshi-kotlin-codegen"
 koin-android = { group = "io.insert-koin", name = "koin-android", version.ref = "koin" }
 koin-compose = { group = "io.insert-koin", name = "koin-androidx-compose", version.ref = "koin" }
 
+# Room
+room-ksp = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
+room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
+room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
+
 secrets = { module = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin:secrets-gradle-plugin", version.ref = "secrets" }
-androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "roomKtx" }
 
 [plugins]
 com-android-application = { id = "com.android.application", version.ref = "agp" }
