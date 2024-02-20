@@ -1,4 +1,4 @@
-package de.htwk.watchtime.network
+package de.htwk.watchtime.network.series
 
 import android.content.Context
 import android.content.SharedPreferences

@@ -7,7 +7,7 @@ import de.htwk.watchtime.data.placeholder.placeHolderSeriesList
 import de.htwk.watchtime.data.toSeries
 import de.htwk.watchtime.data.uiState.HomeScreenUiState
 import de.htwk.watchtime.database.WatchtimeRepository
-import de.htwk.watchtime.network.SeriesRepository
+import de.htwk.watchtime.network.series.SeriesRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

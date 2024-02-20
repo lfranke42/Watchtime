@@ -1,4 +1,4 @@
-package de.htwk.watchtime.network
+package de.htwk.watchtime.network.series
 
 import de.htwk.watchtime.network.dto.LoginRequest
 import de.htwk.watchtime.network.dto.LoginResponse
@@ -37,7 +37,6 @@ interface TvdbApi {
     suspend fun searchSeries(
         @Header("Authorization") authHeader: String,
         @Query("query") name: String
-
     ): Response<SearchResponse>
 
 }

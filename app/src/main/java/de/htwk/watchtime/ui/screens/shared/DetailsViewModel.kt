@@ -7,7 +7,7 @@ import de.htwk.watchtime.data.ExtendedSeries
 import de.htwk.watchtime.data.Season
 import de.htwk.watchtime.data.uiState.DetailsScreenUiState
 import de.htwk.watchtime.database.WatchtimeRepository
-import de.htwk.watchtime.network.SeriesRepository
+import de.htwk.watchtime.network.series.SeriesRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update

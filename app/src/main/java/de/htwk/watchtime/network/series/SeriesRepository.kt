@@ -1,10 +1,6 @@
-package de.htwk.watchtime.network
+package de.htwk.watchtime.network.series
 
-import de.htwk.watchtime.data.Episode
-import de.htwk.watchtime.data.ExtendedSeries
-import de.htwk.watchtime.data.Genre
-import de.htwk.watchtime.data.Season
-import de.htwk.watchtime.data.Series
+import de.htwk.watchtime.data.*
 
 interface SeriesRepository {
     suspend fun getSeries(): List<Series>
@@ -48,11 +44,11 @@ class SeriesRepositoryImpl(
         val seriesList = mutableListOf<Series>()
 
         seriesDtoList.forEach { seriesDto ->
-            if (seriesDto.type == "series"){
+            if (seriesDto.type == "series") {
                 seriesList.add(
                     Series(
                         name = seriesDto.name,
-                        year = seriesDto.year?.substring(0,4) ?: "unknown",
+                        year = seriesDto.year?.substring(0, 4) ?: "unknown",
                         imageUrl = seriesDto.imageUrl,
                         id = seriesDto.id,
                     )
@@ -74,13 +70,11 @@ class SeriesRepositoryImpl(
         }
 
         seriesDetails.seasons.forEach { seasonDto ->
-            seasonList[seasonDto.seasonNumber] = (
-                    Season(
-                        id = seasonDto.id,
-                        seasonNumber = seasonDto.seasonNumber,
-                        episodeIds = mutableListOf(),
-                    )
-                    )
+            seasonList[seasonDto.seasonNumber] = (Season(
+                id = seasonDto.id,
+                seasonNumber = seasonDto.seasonNumber,
+                episodeIds = mutableListOf(),
+            ))
         }
 
         seriesDetails.episodes.forEach { episodeDto ->
@@ -106,8 +100,7 @@ class SeriesRepositoryImpl(
             )
         }
 
-        val filteredSeasonList =
-            seasonList.filterKeys { seasonList[it]?.episodeIds?.isNotEmpty() ?: false }
+        val filteredSeasonList = seasonList.filterKeys { seasonList[it]?.episodeIds?.isNotEmpty() ?: false }
 
         return ExtendedSeries(
             name = seriesDetails.name,
