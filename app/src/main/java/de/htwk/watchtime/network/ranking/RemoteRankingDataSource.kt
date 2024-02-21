@@ -19,7 +19,6 @@ class RemoteRankingDataSourceImpl: RemoteRankingDataSource {
         val deviceId = UUID.randomUUID().toString()
 
         val rankingRequestBody = RankingRequest(deviceId, newTotalWatchtime)
-
         val updateWatchtimeResponse = rankingApi.updateWatchtime(apiKey, rankingRequestBody)
 
         if (!updateWatchtimeResponse.isSuccessful) {

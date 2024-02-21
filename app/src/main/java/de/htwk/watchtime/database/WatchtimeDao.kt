@@ -38,4 +38,9 @@ interface WatchtimeDao {
             "WHERE user.seriesId == series.seriesId and series.seriesCompleted == 0 " +
             "GROUP BY user.seriesId")
     suspend fun getStartedSeriesIds(): List<Int>
+
+    @Query("SELECT SUM(episode.runtime) " +
+            "FROM userWatchtime as user JOIN episodes as episode " +
+            "WHERE user.episodeId == episode.episodeId")
+    suspend fun getTotalWatchtime(): Long
 }

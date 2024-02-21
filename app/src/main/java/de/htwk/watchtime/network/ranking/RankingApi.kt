@@ -17,7 +17,7 @@ interface RankingApi {
 
     @PUT("ranking/user")
     suspend fun updateWatchtime(
-        @Header("Authorization") authHeader: String,
+        @Query("code") functionKey: String,
         @Body rankingRequest: RankingRequest
     ): Response<Void>
 
