@@ -13,10 +13,10 @@ interface RemoteRankingDataSource {
     suspend fun deleteUser()
 }
 
-class RemoteRankingDataSourceImpl: RemoteRankingDataSource {
+class RemoteRankingDataSourceImpl(private val deviceIdManager: DeviceIdManager): RemoteRankingDataSource {
     override suspend fun updateWatchtime(newTotalWatchtime: Long) {
         val apiKey = BuildConfig.AZURE_FUNCTION_KEY
-        val deviceId = UUID.randomUUID().toString()
+        val deviceId = deviceIdManager.getDeviceId()
 
         val rankingRequestBody = RankingRequest(deviceId, newTotalWatchtime)
         val updateWatchtimeResponse = rankingApi.updateWatchtime(apiKey, rankingRequestBody)
@@ -28,7 +28,7 @@ class RemoteRankingDataSourceImpl: RemoteRankingDataSource {
 
     override suspend fun getRanking(): Ranking {
         val apiKey = BuildConfig.AZURE_FUNCTION_KEY
-        val deviceId = UUID.randomUUID().toString()
+        val deviceId = deviceIdManager.getDeviceId()
 
         val rankingResponse = rankingApi.getRanking(apiKey, deviceId)
         val responseBody = rankingResponse.body()
@@ -42,7 +42,7 @@ class RemoteRankingDataSourceImpl: RemoteRankingDataSource {
 
     override suspend fun deleteUser() {
         val apiKey = BuildConfig.AZURE_FUNCTION_KEY
-        val deviceId = UUID.randomUUID().toString()
+        val deviceId = deviceIdManager.getDeviceId()
 
         val deleteResponse = rankingApi.deleteUser(apiKey, deviceId)
 

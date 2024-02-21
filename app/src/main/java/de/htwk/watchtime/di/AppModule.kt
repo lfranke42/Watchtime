@@ -8,10 +8,7 @@ import de.htwk.watchtime.database.WatchtimeDao
 import de.htwk.watchtime.database.WatchtimeDatabase
 import de.htwk.watchtime.database.WatchtimeRepository
 import de.htwk.watchtime.database.WatchtimeRepositoryImpl
-import de.htwk.watchtime.network.ranking.RankingRepository
-import de.htwk.watchtime.network.ranking.RankingRepositoryImpl
-import de.htwk.watchtime.network.ranking.RemoteRankingDataSource
-import de.htwk.watchtime.network.ranking.RemoteRankingDataSourceImpl
+import de.htwk.watchtime.network.ranking.*
 import de.htwk.watchtime.network.series.RemoteSeriesDataSource
 import de.htwk.watchtime.network.series.RemoteSeriesDataSourceImpl
 import de.htwk.watchtime.network.series.SeriesRepository
@@ -34,6 +31,7 @@ val appModule = module {
     singleOf(::RemoteRankingDataSourceImpl) bind RemoteRankingDataSource::class
     singleOf(::RankingRepositoryImpl) bind RankingRepository::class
     singleOf(::SessionManager)
+    singleOf(::DeviceIdManager)
     singleOf(::LocalContext)
     single {
         Room.databaseBuilder(
