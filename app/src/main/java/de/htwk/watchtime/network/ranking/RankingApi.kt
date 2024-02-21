@@ -10,8 +10,8 @@ import retrofit2.http.*
 interface RankingApi {
     @GET("ranking/position/{id}")
     suspend fun getRanking(
-        @Header("Authorization") authHeader: String,
-        @Path("id") id: String
+        @Path("id") id: String,
+        @Query("code") functionKey: String
     ): Response<RankingResponse>
 
 
@@ -23,8 +23,8 @@ interface RankingApi {
 
     @DELETE("ranking/user/{id}")
     suspend fun deleteUser(
-        @Header("Authorization") authHeader: String,
-        @Path("id") id: String
+        @Path("id") id: String,
+        @Query("code") functionKey: String
     ): Response<Void>
 
 }

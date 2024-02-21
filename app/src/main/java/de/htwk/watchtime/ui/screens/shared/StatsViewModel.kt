@@ -2,14 +2,20 @@ package de.htwk.watchtime.ui.screens.shared
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.patrykandpatrick.vico.core.entry.ChartEntryModelProducer
+import com.patrykandpatrick.vico.core.entry.entryOf
 import de.htwk.watchtime.data.uiState.StatsScreenUiState
 import de.htwk.watchtime.database.WatchtimeRepository
+import de.htwk.watchtime.network.ranking.RankingRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class StatsViewModel(private val watchtimeRepository: WatchtimeRepository) : ViewModel() {
+class StatsViewModel(
+    private val watchtimeRepository: WatchtimeRepository,
+    private val rankingRepository: RankingRepository
+) : ViewModel() {
     private val _uiState = MutableStateFlow(
         StatsScreenUiState(
             totalWatchtime = ""
@@ -19,6 +25,7 @@ class StatsViewModel(private val watchtimeRepository: WatchtimeRepository) : Vie
 
     init {
         updateTotalWatchtime()
+        fetchRanking()
     }
 
     private fun updateTotalWatchtime() {
@@ -45,6 +52,26 @@ class StatsViewModel(private val watchtimeRepository: WatchtimeRepository) : Vie
 
             _uiState.value = _uiState.value.copy(
                 totalWatchtime = watchtimeString
+            )
+        }
+    }
+
+    private fun fetchRanking() {
+        viewModelScope.launch {
+            val ranking = rankingRepository.getRanking()
+            _uiState.value = _uiState.value.copy(
+                leaderboard = ranking
+            )
+
+            val chartEntryList =
+                ranking.closestNeighbors.map { entryOf(it.position, it.totalWatchtime.toFloat() / 60) }.toMutableList()
+            chartEntryList.add(entryOf(ranking.position, ranking.totalWatchtime.toFloat() / 60))
+
+            val chartEntryModelProducer = ChartEntryModelProducer(chartEntryList)
+
+            _uiState.value = _uiState.value.copy(
+                personalRank = ranking.position,
+                chartEntryModelProducer = chartEntryModelProducer
             )
         }
     }

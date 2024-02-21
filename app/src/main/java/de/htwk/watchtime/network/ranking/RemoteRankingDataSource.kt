@@ -5,7 +5,6 @@ import de.htwk.watchtime.data.Ranking
 import de.htwk.watchtime.network.NetworkRequestException
 import de.htwk.watchtime.network.dto.RankingRequest
 import de.htwk.watchtime.network.dto.toRanking
-import java.util.*
 
 interface RemoteRankingDataSource {
     suspend fun updateWatchtime(newTotalWatchtime: Long)
@@ -30,7 +29,7 @@ class RemoteRankingDataSourceImpl(private val deviceIdManager: DeviceIdManager):
         val apiKey = BuildConfig.AZURE_FUNCTION_KEY
         val deviceId = deviceIdManager.getDeviceId()
 
-        val rankingResponse = rankingApi.getRanking(apiKey, deviceId)
+        val rankingResponse = rankingApi.getRanking(id = deviceId, functionKey = apiKey)
         val responseBody = rankingResponse.body()
 
         return if (rankingResponse.isSuccessful && responseBody != null)
@@ -44,7 +43,7 @@ class RemoteRankingDataSourceImpl(private val deviceIdManager: DeviceIdManager):
         val apiKey = BuildConfig.AZURE_FUNCTION_KEY
         val deviceId = deviceIdManager.getDeviceId()
 
-        val deleteResponse = rankingApi.deleteUser(apiKey, deviceId)
+        val deleteResponse = rankingApi.deleteUser(id = deviceId, functionKey = apiKey)
 
         if (!deleteResponse.isSuccessful) {
             throw NetworkRequestException("Error deleting user")
