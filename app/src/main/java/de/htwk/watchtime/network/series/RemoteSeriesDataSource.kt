@@ -1,6 +1,5 @@
-package de.htwk.watchtime.network
+package de.htwk.watchtime.network.series
 
-import android.util.Log
 import de.htwk.watchtime.BuildConfig
 import de.htwk.watchtime.network.dto.LoginRequest
 import de.htwk.watchtime.network.dto.SearchDto
@@ -11,8 +10,6 @@ interface RemoteSeriesDataSource {
     suspend fun getSeries(): List<SeriesDto>
     suspend fun getSeriesDetails(id: Int): SeriesExtendedDto?
     suspend fun searchSeries(name: String): List<SearchDto>
-
-
 }
 
 class RemoteSeriesDataSourceImpl(
@@ -27,8 +24,18 @@ class RemoteSeriesDataSourceImpl(
                 throw Exception()
             }
         }
+        var seriesDetailsResponse = tvdbApi.getSeriesDetails(authHeader = token, id = id)
 
-        val seriesDetailsResponse = tvdbApi.getSeriesDetails(authHeader = token, id = id)
+        // Handle token expiration
+        if (seriesDetailsResponse.code() == 401) {
+            token = login()
+            if (token == null) {
+                throw Exception()
+            }
+            sessionManager.saveAuthToken(token)
+            seriesDetailsResponse = tvdbApi.getSeriesDetails(authHeader = token, id = id)
+        }
+
         val responseBody = seriesDetailsResponse.body()
         return if (seriesDetailsResponse.isSuccessful && responseBody != null)
             responseBody.data
@@ -45,10 +52,19 @@ class RemoteSeriesDataSourceImpl(
                 throw Exception()
             }
         }
+        var searchResponse = tvdbApi.searchSeries(authHeader = token, name = name)
 
-        val searchResponse = tvdbApi.searchSeries(authHeader = token, name = name)
+        // Handle token expiration
+        if (searchResponse.code() == 401) {
+            token = login()
+            if (token == null) {
+                throw Exception()
+            }
+            sessionManager.saveAuthToken(token)
+            searchResponse = tvdbApi.searchSeries(authHeader = token, name = name)
+        }
+
         val responseBody = searchResponse.body()
-
         return if(searchResponse.isSuccessful && responseBody != null)
          responseBody.data
         else{
@@ -65,10 +81,19 @@ class RemoteSeriesDataSourceImpl(
                 throw Exception()
             }
         }
+        var seriesResponse = tvdbApi.getSeries(token)
 
-        val seriesResponse = tvdbApi.getSeries(token)
+        // Handle token expiration
+        if (seriesResponse.code() == 401) {
+            token = login()
+            if (token == null) {
+                throw Exception()
+            }
+            sessionManager.saveAuthToken(token)
+            seriesResponse = tvdbApi.getSeries(token)
+        }
+
         val responseBody = seriesResponse.body()
-
         return if (seriesResponse.isSuccessful && responseBody != null)
             responseBody.data
         else {
@@ -78,7 +103,6 @@ class RemoteSeriesDataSourceImpl(
 
     private suspend fun login(): String? {
         val apiKey = BuildConfig.API_KEY
-        Log.w("API_KEY", apiKey)
         val loginResponse =
             tvdbApi.login(loginRequest = LoginRequest(apiKey = apiKey))
         val responseBody = loginResponse.body()

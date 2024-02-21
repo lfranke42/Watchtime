@@ -8,11 +8,12 @@ import de.htwk.watchtime.database.WatchtimeDao
 import de.htwk.watchtime.database.WatchtimeDatabase
 import de.htwk.watchtime.database.WatchtimeRepository
 import de.htwk.watchtime.database.WatchtimeRepositoryImpl
-import de.htwk.watchtime.network.RemoteSeriesDataSource
-import de.htwk.watchtime.network.RemoteSeriesDataSourceImpl
-import de.htwk.watchtime.network.SeriesRepository
-import de.htwk.watchtime.network.SeriesRepositoryImpl
-import de.htwk.watchtime.network.SessionManager
+import de.htwk.watchtime.network.ranking.*
+import de.htwk.watchtime.network.series.RemoteSeriesDataSource
+import de.htwk.watchtime.network.series.RemoteSeriesDataSourceImpl
+import de.htwk.watchtime.network.series.SeriesRepository
+import de.htwk.watchtime.network.series.SeriesRepositoryImpl
+import de.htwk.watchtime.network.series.SessionManager
 import de.htwk.watchtime.ui.screens.shared.DetailsViewModel
 import de.htwk.watchtime.ui.screens.shared.HomeViewModel
 import de.htwk.watchtime.ui.screens.shared.SearchViewModel
@@ -27,7 +28,10 @@ val appModule = module {
     singleOf(::SeriesRepositoryImpl) bind SeriesRepository::class
     singleOf(::LocalWatchtimeDataSourceImpl) bind LocalWatchtimeDataSource::class
     singleOf(::WatchtimeRepositoryImpl) bind WatchtimeRepository::class
+    singleOf(::RemoteRankingDataSourceImpl) bind RemoteRankingDataSource::class
+    singleOf(::RankingRepositoryImpl) bind RankingRepository::class
     singleOf(::SessionManager)
+    singleOf(::DeviceIdManager)
     singleOf(::LocalContext)
     single {
         Room.databaseBuilder(

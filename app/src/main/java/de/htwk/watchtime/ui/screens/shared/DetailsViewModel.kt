@@ -1,13 +1,13 @@
 package de.htwk.watchtime.ui.screens.shared
 
-import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
+import de.htwk.watchtime.data.Event
 import de.htwk.watchtime.data.ExtendedSeries
 import de.htwk.watchtime.data.Season
 import de.htwk.watchtime.data.uiState.DetailsScreenUiState
 import de.htwk.watchtime.database.WatchtimeRepository
-import de.htwk.watchtime.network.SeriesRepository
+import de.htwk.watchtime.network.ranking.RankingRepository
+import de.htwk.watchtime.network.series.SeriesRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -17,8 +17,10 @@ class DetailsViewModel(
     savedStateHandle: SavedStateHandle,
     private val seriesRepository: SeriesRepository,
     private val watchtimeRepository: WatchtimeRepository,
+    private val rankingRepository: RankingRepository,
 ) : ViewModel() {
     private val seriesId: Int = checkNotNull(savedStateHandle.get<Int>("seriesId"))
+    private val errorOccurred = MutableLiveData<Event<String>>()
 
     private val _detailsScreenUiState: MutableStateFlow<DetailsScreenUiState> = MutableStateFlow(
         DetailsScreenUiState(
@@ -35,6 +37,8 @@ class DetailsViewModel(
         )
     )
     val uiState: StateFlow<DetailsScreenUiState> = _detailsScreenUiState
+    val message: LiveData<Event<String>>
+        get() = errorOccurred
 
     init {
         loadSeriesDetails()
@@ -228,6 +232,7 @@ class DetailsViewModel(
         }
 
         checkIfSeriesIsCompleted()
+        updateRanking()
     }
 
     private fun checkIfSeriesIsCompleted() {
@@ -245,6 +250,26 @@ class DetailsViewModel(
             // TODO: Optimize, so that DB is only updated if value actually changes
             viewModelScope.launch {
                 watchtimeRepository.updateSeriesCompletion(seriesId, newCompletionState)
+            }
+        }
+    }
+
+    private fun updateRanking() {
+        viewModelScope.launch {
+            val totalWatchtime = watchtimeRepository.getTotalWatchtime()
+            if (totalWatchtime == 0L) {
+                try {
+                    rankingRepository.deleteUser()
+                } catch (e: Exception) {
+                    errorOccurred.value = Event("Error deleting user from rankings")
+                }
+                return@launch
+            }
+
+            try {
+                rankingRepository.updateWatchtime(totalWatchtime)
+            } catch (e: Exception) {
+                errorOccurred.value = Event("Error updating rankings")
             }
         }
     }
