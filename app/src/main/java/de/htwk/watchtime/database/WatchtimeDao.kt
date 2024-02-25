@@ -41,6 +41,6 @@ interface WatchtimeDao {
 
     @Query("SELECT SUM(episode.runtime) " +
             "FROM userWatchtime as user JOIN episodes as episode " +
-            "WHERE user.episodeId == episode.episodeId")
+            "WHERE user.episodeId == episode.episodeId AND user.seriesId == episode.seriesId")
     suspend fun getTotalWatchtime(): Long
 }

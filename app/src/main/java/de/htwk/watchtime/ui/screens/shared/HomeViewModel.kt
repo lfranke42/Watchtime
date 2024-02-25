@@ -42,6 +42,7 @@ class HomeViewModel(
 
             // Check if series already in DB, if not add it
             uiState.value.series.forEach { series ->
+                if (series.id == null) return@forEach
                 val dbSeriesResult = watchtimeRepository.getSeries(series.id)
                 if (dbSeriesResult == null) {
                     watchtimeRepository.insertSeries(series)

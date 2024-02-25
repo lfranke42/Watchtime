@@ -1,6 +1,11 @@
 package de.htwk.watchtime.ui.screens.shared
 
-import androidx.lifecycle.*
+import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import de.htwk.watchtime.data.Event
 import de.htwk.watchtime.data.ExtendedSeries
 import de.htwk.watchtime.data.Season
@@ -232,7 +237,6 @@ class DetailsViewModel(
         }
 
         checkIfSeriesIsCompleted()
-        updateRanking()
     }
 
     private fun checkIfSeriesIsCompleted() {
@@ -250,6 +254,7 @@ class DetailsViewModel(
             // TODO: Optimize, so that DB is only updated if value actually changes
             viewModelScope.launch {
                 watchtimeRepository.updateSeriesCompletion(seriesId, newCompletionState)
+                updateRanking()
             }
         }
     }
@@ -257,6 +262,7 @@ class DetailsViewModel(
     private fun updateRanking() {
         viewModelScope.launch {
             val totalWatchtime = watchtimeRepository.getTotalWatchtime()
+            Log.i("watchtime", totalWatchtime.toString())
             if (totalWatchtime == 0L) {
                 try {
                     rankingRepository.deleteUser()

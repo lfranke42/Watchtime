@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -21,7 +20,6 @@ import coil.compose.AsyncImage
 import de.htwk.watchtime.R
 import de.htwk.watchtime.data.Series
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CarouselCard(
     series: Series,
@@ -29,7 +27,11 @@ fun CarouselCard(
     onCardTap: (seriesId: Int) -> Unit = {}
 ) {
     Card(
-        onClick = { onCardTap(series.id) },
+        onClick = {
+            if (series.id != null) {
+                onCardTap(series.id)
+            }
+        },
         elevation = CardDefaults.cardElevation(
             defaultElevation = 8.dp
         ),
