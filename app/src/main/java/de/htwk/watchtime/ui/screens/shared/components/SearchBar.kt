@@ -19,7 +19,6 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
@@ -32,16 +31,13 @@ import de.htwk.watchtime.R
 import de.htwk.watchtime.ui.screens.shared.SearchViewModel
 
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun RoundedSearchBar(
     modifier: Modifier = Modifier,
     viewModel: SearchViewModel,
-    onCardTap: (seriesId: Int) -> Unit = {}
 ) {
     val searchQuery by viewModel.searchQuery.collectAsState()
     val isSearching by viewModel.isSearching.collectAsState()
-    val searchResult by viewModel.searchResult.collectAsState()
 
     val keyboardController = LocalSoftwareKeyboardController.current
     val density = LocalDensity.current.density
@@ -82,7 +78,10 @@ fun RoundedSearchBar(
                 }
             ),
             leadingIcon = {
-                Icon(painter = painterResource(id = R.drawable.outline_search_24), contentDescription = null)
+                Icon(
+                    painter = painterResource(id = R.drawable.outline_search_24),
+                    contentDescription = null
+                )
             },
             trailingIcon = {
                 if (isSearching || searchQuery.isNotBlank()) {
@@ -102,17 +101,6 @@ fun RoundedSearchBar(
                 .fillMaxWidth()
                 .height(56.dp)
         )
-
-        if (isSearching) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-            ) {
-                searchResult.forEach { series ->
-                    SeriesCard(series = series, onTap = onCardTap)
-                }
-            }
-        }
     }
 }
 
