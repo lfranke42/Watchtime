@@ -1,16 +1,20 @@
 package de.htwk.watchtime.ui.screens.shared
 
+import android.content.res.Resources.NotFoundException
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.patrykandpatrick.vico.core.entry.ChartEntryModelProducer
 import com.patrykandpatrick.vico.core.entry.entryOf
+import de.htwk.watchtime.data.Ranking
 import de.htwk.watchtime.data.uiState.StatsScreenUiState
 import de.htwk.watchtime.database.WatchtimeRepository
+import de.htwk.watchtime.network.NetworkRequestException
 import de.htwk.watchtime.network.ranking.RankingRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlin.reflect.typeOf
 
 class StatsViewModel(
     private val watchtimeRepository: WatchtimeRepository,
@@ -58,13 +62,32 @@ class StatsViewModel(
 
     private fun fetchRanking() {
         viewModelScope.launch {
-            val ranking = rankingRepository.getRanking()
+            val ranking: Ranking
+            try {
+                ranking = rankingRepository.getRanking()
+            } catch (e: NotFoundException) {
+                _uiState.value = _uiState.value.copy(
+                    noTimeTracked = true
+                )
+                return@launch
+            } catch (e: NetworkRequestException) {
+                /* TODO: Display Toast error */
+                return@launch
+            }
+
+
             _uiState.value = _uiState.value.copy(
-                leaderboard = ranking
+                leaderboard = ranking,
+                noTimeTracked = false
             )
 
             val chartEntryList =
-                ranking.closestNeighbors.map { entryOf(it.position, it.totalWatchtime.toFloat() / 60) }.toMutableList()
+                ranking.closestNeighbors.map {
+                    entryOf(
+                        it.position,
+                        it.totalWatchtime.toFloat() / 60
+                    )
+                }.toMutableList()
             chartEntryList.add(entryOf(ranking.position, ranking.totalWatchtime.toFloat() / 60))
 
             val chartEntryModelProducer = ChartEntryModelProducer(chartEntryList)

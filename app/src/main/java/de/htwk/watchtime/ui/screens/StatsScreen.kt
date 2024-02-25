@@ -23,6 +23,7 @@ import com.patrykandpatrick.vico.core.entry.ChartEntryModelProducer
 import de.htwk.watchtime.R
 import de.htwk.watchtime.ui.screens.shared.StatsViewModel
 import org.koin.androidx.compose.koinViewModel
+import kotlin.math.roundToInt
 
 @Composable
 fun StatsScreen(modifier: Modifier = Modifier, viewModel: StatsViewModel = koinViewModel()) {
@@ -31,7 +32,8 @@ fun StatsScreen(modifier: Modifier = Modifier, viewModel: StatsViewModel = koinV
         modifier = modifier,
         totalWatchtime = uiState.totalWatchtime,
         chartEntryModelProducer = uiState.chartEntryModelProducer,
-        personalRank = uiState.personalRank
+        personalRank = uiState.personalRank,
+        noTimeTracked = uiState.noTimeTracked
     )
 }
 
@@ -40,7 +42,8 @@ private fun StatsScreenContent(
     modifier: Modifier = Modifier,
     totalWatchtime: String,
     chartEntryModelProducer: ChartEntryModelProducer?,
-    personalRank: Int?
+    personalRank: Int?,
+    noTimeTracked: Boolean,
 ) {
     Column(
         modifier = modifier
@@ -49,7 +52,11 @@ private fun StatsScreenContent(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         TotalWatchtimeCard(totalWatchtime = totalWatchtime)
-        LeaderboardCard(chartEntryModelProducer = chartEntryModelProducer, personalRank = personalRank)
+        LeaderboardCard(
+            chartEntryModelProducer = chartEntryModelProducer,
+            personalRank = personalRank,
+            noTimeTracked = noTimeTracked,
+        )
     }
 }
 
@@ -73,9 +80,15 @@ private fun TotalWatchtimeCard(totalWatchtime: String) {
 }
 
 @Composable
-private fun LeaderboardCard(chartEntryModelProducer: ChartEntryModelProducer? = null, personalRank: Int? = null) {
+private fun LeaderboardCard(
+    chartEntryModelProducer: ChartEntryModelProducer? = null,
+    personalRank: Int? = null,
+    noTimeTracked: Boolean
+) {
     val xAxisValueFormatter =
-        AxisValueFormatter<AxisPosition.Vertical.Start> { value, _ -> Math.round(value).toString() }
+        AxisValueFormatter<AxisPosition.Vertical.Start> { value, _ ->
+            value.roundToInt().toString()
+        }
 
     ElevatedCard(modifier = Modifier.fillMaxWidth()) {
         Column(
@@ -112,8 +125,15 @@ private fun LeaderboardCard(chartEntryModelProducer: ChartEntryModelProducer? = 
                     )
                 )
             } else {
-                Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-                    CircularProgressIndicator(modifier = Modifier.size(48.dp))
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    if (noTimeTracked) {
+                        Text(text = stringResource(R.string.stats_screen_no_leaderboard_fallback))
+                    } else {
+                        CircularProgressIndicator(modifier = Modifier.size(48.dp))
+                    }
                 }
             }
         }
