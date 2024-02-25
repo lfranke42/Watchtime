@@ -46,6 +46,8 @@ class WatchtimeRepositoryImpl(private val watchtimeDataSource: LocalWatchtimeDat
     }
 
     override suspend fun insertSeries(series: Series) {
+        if (series.id == null) return
+
         val dbSeries = SeriesDbEntry(
             seriesId = series.id,
             seriesCompleted = false

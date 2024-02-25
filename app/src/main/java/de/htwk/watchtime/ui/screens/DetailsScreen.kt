@@ -1,15 +1,43 @@
 package de.htwk.watchtime.ui.screens
 
 import android.widget.Toast
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.AssistChip
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.surfaceColorAtElevation
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -95,55 +123,49 @@ fun DetailsScreen(
 ) {
     val seasonEpisodes: List<Episode> =
         seriesDetails.episodes.filter { it.seasonNumber == selectedSeason }
+    val scrollState = rememberScrollState()
 
     Box(modifier = modifier.fillMaxSize()) {
-        ElevatedCard(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-        ) {
-            LazyColumn {
-                item {
-                    CardHeader(
-                        title = seriesDetails.name,
-                        year = seriesDetails.year,
-                        seasons = seriesDetails.seasons.size.toString(),
-                        episodes = seriesDetails.episodes.size.toString(),
-                        seriesCompleted = seriesCompleted,
-                        toggleSeriesWatched = toggleSeriesWatched,
-                        dropDownExpanded = dropDownExpanded,
-                        toggleDropDown = toggleDropDown,
-                        dismissDropDown = dismissDropDown
-                    )
-                }
-                item {
-                    SeriesImage(
-                        imageUrl = seriesDetails.imageUrl ?: "unavailable",
-                        modifier = Modifier
-                            .fillMaxWidth()
-                    )
-                }
+        Column(modifier = Modifier.verticalScroll(enabled = true, state = scrollState)) {
+            ElevatedCard(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+            ) {
+                CardHeader(
+                    title = seriesDetails.name,
+                    year = seriesDetails.year,
+                    seasons = seriesDetails.seasons.size.toString(),
+                    episodes = seriesDetails.episodes.size.toString(),
+                    seriesCompleted = seriesCompleted,
+                    toggleSeriesWatched = toggleSeriesWatched,
+                    dropDownExpanded = dropDownExpanded,
+                    toggleDropDown = toggleDropDown,
+                    dismissDropDown = dismissDropDown
+                )
+                SeriesImage(
+                    imageUrl = seriesDetails.imageUrl ?: "unavailable",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                )
                 if (seriesDetails.description != null) {
-                    item {
-                        SeriesDescription(description = seriesDetails.description)
+                    SeriesDescription(description = seriesDetails.description)
+                }
+                SeasonHeader(
+                    selectedSeason = selectedSeason,
+                    openSeasonSelect = openBottomSheet,
+                    seasonCompleted = seasonCompleted,
+                    onSeasonWatchedChange = {
+                        val currentSeason = seriesDetails.seasons[selectedSeason] ?: Season(
+                            id = 0,
+                            seasonNumber = 0,
+                            episodeIds = mutableListOf()
+                        )
+                        onSeasonWatchedChange(currentSeason, seasonCompleted)
                     }
-                }
-                item {
-                    SeasonHeader(
-                        selectedSeason = selectedSeason,
-                        openSeasonSelect = openBottomSheet,
-                        seasonCompleted = seasonCompleted,
-                        onSeasonWatchedChange = {
-                            val currentSeason = seriesDetails.seasons[selectedSeason] ?: Season(
-                                id = 0,
-                                seasonNumber = 0,
-                                episodeIds = mutableListOf()
-                            )
-                            onSeasonWatchedChange(currentSeason, seasonCompleted)
-                        }
-                    )
-                }
-                itemsIndexed(seasonEpisodes) { index, episode ->
+                )
+
+                seasonEpisodes.mapIndexed { index, episode ->
                     val checked = episodesWatched.contains(episode.id)
                     EpisodeRow(
                         episodeTitle = episode.name ?: "unknown name",
@@ -157,9 +179,7 @@ fun DetailsScreen(
                         }
                     )
                 }
-                item {
-                    Spacer(modifier = Modifier.height(16.dp))
-                }
+                Spacer(modifier = Modifier.height(16.dp))
             }
         }
     }
@@ -330,34 +350,43 @@ fun SeasonSelectBottomSheet(
         ) {
             seasons.forEach { (seasonNumber, _) ->
                 item {
-                    FilterChip(
-                        onClick = { changeSeason(seasonNumber) },
-                        selected = seasonNumber == selectedSeason,
-                        label = {
-                            Row(
-                                modifier = Modifier.width(192.dp),
-                                horizontalArrangement = Arrangement.Center,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                if (seasonNumber == selectedSeason) {
-                                    Icon(
-                                        Icons.Default.Check,
-                                        contentDescription = stringResource(id = R.string.details_screen_select_season),
-                                        modifier = Modifier.padding(end = 8.dp)
-                                    )
-                                }
-                                Text(
-                                    text = stringResource(id = R.string.details_screen_season_chip) + " " + seasonNumber,
-                                    textAlign = TextAlign.Center
-                                )
-                            }
-                        },
-                    )
+                    SeasonChip(changeSeason, seasonNumber, selectedSeason)
                 }
             }
 
         }
     }
+}
+
+@Composable
+private fun SeasonChip(
+    changeSeason: (Int) -> Unit,
+    seasonNumber: Int,
+    selectedSeason: Int
+) {
+    FilterChip(
+        onClick = { changeSeason(seasonNumber) },
+        selected = seasonNumber == selectedSeason,
+        label = {
+            Row(
+                modifier = Modifier.width(192.dp),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                if (seasonNumber == selectedSeason) {
+                    Icon(
+                        Icons.Default.Check,
+                        contentDescription = stringResource(id = R.string.details_screen_select_season),
+                        modifier = Modifier.padding(end = 8.dp)
+                    )
+                }
+                Text(
+                    text = stringResource(id = R.string.details_screen_season_chip) + " " + seasonNumber,
+                    textAlign = TextAlign.Center
+                )
+            }
+        },
+    )
 }
 
 @Composable

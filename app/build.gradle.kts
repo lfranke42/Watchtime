@@ -92,6 +92,8 @@ dependencies {
     implementation(libs.room.ktx)
     ksp(libs.room.ksp)
 
+    implementation(libs.vico.compose)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.espresso.core)

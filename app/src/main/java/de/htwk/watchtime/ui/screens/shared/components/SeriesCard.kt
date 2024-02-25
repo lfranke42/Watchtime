@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -37,13 +36,11 @@ import coil.compose.AsyncImage
 import de.htwk.watchtime.R
 import de.htwk.watchtime.data.Series
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SeriesCard(
     series: Series,
     onTap: (seriesId: Int) -> Unit = {},
-
-    ) {
+) {
     var contentScale by remember {
         mutableStateOf(ContentScale.Crop)
     }
@@ -59,7 +56,11 @@ fun SeriesCard(
         elevation = CardDefaults.cardElevation(
             defaultElevation = 8.dp
         ),
-        onClick = { onTap(series.id) }
+        onClick = {
+            if (series.id != null) {
+                onTap(series.id)
+            }
+        }
     ) {
         Row(modifier = Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically) {
             Surface(
@@ -102,7 +103,6 @@ fun SeriesCard(
         }
     }
 }
-
 
 
 @Preview

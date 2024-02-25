@@ -21,4 +21,11 @@
     <string name="details_screen_season_chip">Season</string>
     <string name="details_screen_watched_title">Season Completed?</string>
     <string name="details_screen_series_completed">Series Completed</string>
+
+    <string name="stats_screen_total_time_watched">Total time watched</string>
+    <string name="stats_screen_leaderboard_title">Leaderboard</string>
+    <string name="stats_screen_personal_rank">"Your rank: "</string>
+    <string name="stats_screen_chart_rank_label">Rank</string>
+    <string name="stats_screen_chart_hours_label">Hours</string>
+    <string name="stats_screen_no_leaderboard_fallback">Start tracking your time to display the leaderboard!</string>
 </resources>

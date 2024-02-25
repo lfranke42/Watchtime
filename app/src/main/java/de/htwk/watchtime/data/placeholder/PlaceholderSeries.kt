@@ -6,7 +6,7 @@ private val placeHolderSeries = Series(
     name = "",
     year = "",
     imageUrl = null,
-    id = 0,
+    id = null,
 )
 
 val placeHolderSeriesList = List(10) { placeHolderSeries }

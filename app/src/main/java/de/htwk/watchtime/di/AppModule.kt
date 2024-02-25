@@ -17,6 +17,7 @@ import de.htwk.watchtime.network.series.SessionManager
 import de.htwk.watchtime.ui.screens.shared.DetailsViewModel
 import de.htwk.watchtime.ui.screens.shared.HomeViewModel
 import de.htwk.watchtime.ui.screens.shared.SearchViewModel
+import de.htwk.watchtime.ui.screens.shared.StatsViewModel
 import org.koin.android.ext.koin.androidApplication
 import org.koin.androidx.viewmodel.dsl.viewModelOf
 import org.koin.core.module.dsl.singleOf
@@ -47,4 +48,5 @@ val appModule = module {
     viewModelOf(::HomeViewModel)
     viewModelOf(::DetailsViewModel)
     viewModelOf(::SearchViewModel)
+    viewModelOf(::StatsViewModel)
 }
