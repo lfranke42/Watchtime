@@ -1,31 +1,34 @@
 package de.htwk.watchtime.ui.screens.shared
 
 import android.content.res.Resources.NotFoundException
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.patrykandpatrick.vico.core.entry.ChartEntryModelProducer
 import com.patrykandpatrick.vico.core.entry.entryOf
+import de.htwk.watchtime.data.Event
 import de.htwk.watchtime.data.Ranking
 import de.htwk.watchtime.data.uiState.StatsScreenUiState
 import de.htwk.watchtime.database.WatchtimeRepository
-import de.htwk.watchtime.network.NetworkRequestException
 import de.htwk.watchtime.network.ranking.RankingRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlin.reflect.typeOf
 
 class StatsViewModel(
     private val watchtimeRepository: WatchtimeRepository,
     private val rankingRepository: RankingRepository
 ) : ViewModel() {
+    private val errorOccurred = MutableLiveData<Event<String>>()
     private val _uiState = MutableStateFlow(
         StatsScreenUiState(
             totalWatchtime = ""
         )
     )
     val uiState: StateFlow<StatsScreenUiState> = _uiState.asStateFlow()
+    val message: LiveData<Event<String>> get() = errorOccurred
 
     init {
         updateTotalWatchtime()
@@ -70,8 +73,8 @@ class StatsViewModel(
                     noTimeTracked = true
                 )
                 return@launch
-            } catch (e: NetworkRequestException) {
-                /* TODO: Display Toast error */
+            } catch (e: Exception) {
+                errorOccurred.value = Event("Failed to retrieve ranking")
                 return@launch
             }
 
