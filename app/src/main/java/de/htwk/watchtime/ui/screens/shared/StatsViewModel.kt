@@ -35,7 +35,7 @@ class StatsViewModel(
         fetchRanking()
     }
 
-    private fun updateTotalWatchtime() {
+    fun updateTotalWatchtime() {
         viewModelScope.launch {
             var watchtimeInMinutes = watchtimeRepository.getTotalWatchtime()
             var watchtimeInHours = 0
