@@ -26,6 +26,6 @@
     <string name="stats_screen_leaderboard_title">Leaderboard</string>
     <string name="stats_screen_personal_rank">"Your rank: "</string>
     <string name="stats_screen_chart_rank_label">Rank</string>
-    <string name="stats_screen_chart_hours_label">Hours</string>
+    <string name="stats_screen_chart_hours_label">Hours watched</string>
     <string name="stats_screen_no_leaderboard_fallback">Start tracking your time to display the leaderboard!</string>
 </resources>
