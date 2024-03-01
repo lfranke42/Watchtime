@@ -40,12 +40,13 @@ The app is pretty self-explanatory, but here are some tips:
  - The stats screen shows you how much time you've spent watching TV Shows compared to others and a rundown of your total watch time
 
 # Screenshots
-
-
-
+<img src="https://github.com/lfranke42/Watchtime/assets/84925848/c2cddd06-a0d1-478a-9cc3-77959f606267" width="150"> 
+<img src="https://github.com/lfranke42/Watchtime/assets/84925848/5e070f95-5a79-471b-9615-f5cb55058c7e" width="150"> 
+<img src="https://github.com/lfranke42/Watchtime/assets/84925848/13235183-ceed-4189-b34b-d45277595e48" width="150"> 
+<img src="https://github.com/lfranke42/Watchtime/assets/84925848/283b17e6-a6d1-4f1b-8295-c4ece489a292" width="150"> 
+<img src="https://github.com/lfranke42/Watchtime/assets/84925848/90cf5cdb-0bc7-4ad4-b4a5-07875f365b46" width="150"> 
 
 # Credits
-
 Metadata is provided by TheTVDB. 
 Please consider adding missing information or subscribing.
 
