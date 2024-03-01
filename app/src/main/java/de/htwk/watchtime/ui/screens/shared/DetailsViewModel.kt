@@ -51,7 +51,14 @@ class DetailsViewModel(
 
     private fun loadSeriesDetails() {
         viewModelScope.launch {
-            val seriesDetails = seriesRepository.getSeriesDetails(seriesId)
+            val seriesDetails: ExtendedSeries
+            try {
+                seriesDetails = seriesRepository.getSeriesDetails(seriesId)
+            } catch (e: Exception) {
+                errorOccurred.value = Event( "Error occurred while retrieving series details")
+                return@launch
+            }
+
             val episodeIdsWatched = watchtimeRepository.getWatchedEpisodeIds(seriesId)
 
             _detailsScreenUiState.update { currentState ->

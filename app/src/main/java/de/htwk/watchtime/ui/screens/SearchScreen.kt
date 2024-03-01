@@ -1,5 +1,6 @@
 package de.htwk.watchtime.ui.screens
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,6 +12,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
 import de.htwk.watchtime.data.Series
 import de.htwk.watchtime.ui.screens.shared.SearchViewModel
@@ -38,6 +41,14 @@ fun SearchScreenContent(
     viewModel: SearchViewModel
 ) {
     val searchResult: List<Series> by viewModel.searchResult.collectAsState()
+
+    val context = LocalContext.current
+    val lifecycle = LocalLifecycleOwner.current
+    viewModel.message.observe(lifecycle) {
+        it.getContentIfNotHandled()?.let { message ->
+            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+        }
+    }
 
     LazyColumn(
         modifier = modifier

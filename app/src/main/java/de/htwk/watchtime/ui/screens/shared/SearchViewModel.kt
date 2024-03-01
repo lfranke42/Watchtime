@@ -1,7 +1,10 @@
 package de.htwk.watchtime.ui.screens.shared
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import de.htwk.watchtime.data.Event
 import de.htwk.watchtime.data.Series
 import de.htwk.watchtime.database.WatchtimeRepository
 import de.htwk.watchtime.network.series.SeriesRepository
@@ -13,15 +16,15 @@ class SearchViewModel(
     private val seriesRepository: SeriesRepository,
     private val watchtimeRepository: WatchtimeRepository
 ) : ViewModel() {
-
     private val _searchQuery = MutableStateFlow("")
-    val searchQuery: StateFlow<String> get() = _searchQuery
-
     private val _isSearching = MutableStateFlow(false)
-    val isSearching: StateFlow<Boolean> get() = _isSearching
-
     private val _searchResult = MutableStateFlow<List<Series>>(emptyList())
+    private val errorOccurred = MutableLiveData<Event<String>>()
+
+    val searchQuery: StateFlow<String> get() = _searchQuery
+    val isSearching: StateFlow<Boolean> get() = _isSearching
     val searchResult: StateFlow<List<Series>> get() = _searchResult
+    val message: LiveData<Event<String>> get() = errorOccurred
 
     fun setSearchQuery(query: String) {
         _searchQuery.value = query
@@ -50,6 +53,9 @@ class SearchViewModel(
                             watchtimeRepository.insertSeries(series)
                         }
                     }
+                } catch (e: Exception) {
+                    errorOccurred.value =
+                        Event("Failed to search the database, check your internet connection")
                 } finally {
                     _isSearching.value = false
                 }

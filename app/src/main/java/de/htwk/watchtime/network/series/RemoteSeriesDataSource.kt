@@ -1,6 +1,7 @@
 package de.htwk.watchtime.network.series
 
 import de.htwk.watchtime.BuildConfig
+import de.htwk.watchtime.network.NetworkRequestException
 import de.htwk.watchtime.network.dto.LoginRequest
 import de.htwk.watchtime.network.dto.SearchDto
 import de.htwk.watchtime.network.dto.SeriesDto
@@ -78,7 +79,7 @@ class RemoteSeriesDataSourceImpl(
         if (token == null) {
             token = login()
             if (token == null) {
-                throw Exception()
+                throw Exception("Could not obtain valid token")
             }
         }
         var seriesResponse = tvdbApi.getSeries(token)
@@ -87,7 +88,7 @@ class RemoteSeriesDataSourceImpl(
         if (seriesResponse.code() == 401) {
             token = login()
             if (token == null) {
-                throw Exception()
+                throw Exception("Could not obtain valid token")
             }
             sessionManager.saveAuthToken(token)
             seriesResponse = tvdbApi.getSeries(token)
@@ -97,7 +98,7 @@ class RemoteSeriesDataSourceImpl(
         return if (seriesResponse.isSuccessful && responseBody != null)
             responseBody.data
         else {
-            listOf()
+            throw NetworkRequestException("Failed to retrieve Series information")
         }
     }
 
